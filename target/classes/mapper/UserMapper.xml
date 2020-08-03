@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN"  
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="vip.pilipala.dao.UserMapper">
+
+	<resultMap type="vip.pilipala.model.User" id="UserMap">
+		<id property="userID" column="USER_ID" />
+		<result property="userName" column="USER_NAME" />
+		<result property="userEmail" column="USER_EMAIL" />
+		<result property="userLevel" column="USER_LEVEL" />
+		<result property="userPassword" column="USER_PASSWORD" />
+		<result property="userDescription" column="USER_DESCRIPTION" />
+	</resultMap>
+	
+	<insert id="insertUser" parameterType="vip.pilipala.model.User">INSERT INTO a_user(USER_NAME,USER_PASSWORD,USER_EMAIL,USER_LEVEL) VALUES (#{userName},#{userPassword},#{userEmail},#{userLevel})</insert>
+	
+	<select id="findUser" resultMap="UserMap" resultType="vip.pilipala.model.User" >SELECT USER_ID , USER_NAME, USER_EMAIL , USER_LEVEL , USER_DESCRIPTION FROM a_user WHERE USER_EMAIL=#{UserEmail} AND USER_PASSWORD=#{UserPassword} </select>
+	
+	<update id="updataUserPassword" parameterType="java.util.Map">UPDATE a_user SET USER_PASSWORD = #{UserPassword} WHERE USER_EMAIL=#{UserEmail}</update>
+	
+	<select id="findUserById" resultMap="UserMap" resultType="vip.pilipala.model.User" >SELECT USER_ID , USER_NAME, USER_EMAIL , USER_LEVEL , USER_DESCRIPTION FROM a_user WHERE USER_ID = #{UserID} </select>
+	
+	<select id="findUserByIdEmail" resultMap="UserMap" resultType="vip.pilipala.model.User" >SELECT USER_ID , USER_NAME, USER_PASSWORD, USER_EMAIL , USER_LEVEL , USER_DESCRIPTION FROM a_user WHERE USER_EMAIL = #{USER_EMAIL} </select>
+	
+	<update id="updataUserInfo" parameterType="java.util.Map">UPDATE a_user SET `USER_DESCRIPTION`=#{UserDescription} , `USER_NAME`=#{UserName} WHERE  `USER_ID`= ${UserID};</update>
+	
+	<select id="findUserHomePage" resultType="java.util.Map" >
+		SELECT 
+			user.USER_ID USER_ID, 
+			user.USER_NAME USER_NAME, 
+			misc.DATA_INFO USER_LEVEL, 
+			user.USER_DESCRIPTION USER_DESCRIPTION, 
+			(SELECT COUNT(1) FROM a_attention atte WHERE atte.USER_FOLLOWED = user.USER_ID) FANS , 
+			(SELECT COUNT(1) FROM a_attention atte WHERE atte.USER_ID = user.USER_ID) ATTENTION,
+			(SELECT COUNT(1) FROM a_resources res WHERE res.USER_ID = user.USER_ID) RES,
+			(SELECT COUNT(1) FROM a_comment comm WHERE comm.USER_ID = user.USER_ID) COMMENT 
+		FROM a_user user LEFT JOIN a_miscellaneous misc ON user.USER_LEVEL = misc.DATA_ID AND misc.CATEGROY = 1
+		WHERE user.USER_ID = #{UserID}
+	</select>
+	
+	<select id="getUserLevelList" resultType="java.util.Map" >
+		SELECT misc.MISC_ID MISC_ID,misc.DATA_ID LEVEL_ID,misc.DATA_INFO LEVEL_INFO  FROM a_miscellaneous misc WHERE misc.CATEGROY=1;
+	</select>
+	
+	<select id="getUserList" resultType="java.util.Map" >
+		SELECT 
+			user.USER_ID USER_ID, 
+			user.USER_NAME USER_NAME, 
+			user.USER_EMAIL USER_EMAIL, 
+			user.USER_LEVEL USER_LEVEL, 
+			user.USER_DESCRIPTION USER_DESCRIPTION,
+			misc.DATA_INFO USER_LEVEL_INFO
+		FROM `astringent`.`a_user` user
+		LEFT JOIN `astringent`.`a_miscellaneous` misc 
+		ON misc.CATEGROY = 1 AND user.USER_LEVEL = misc.DATA_ID 
+		WHERE 1=1
+		<if test="UserName!=null and UserName!=''">
+			AND user.USER_NAME LIKE CONCAT('%',#{UserName},'%') 
+		</if>
+		<if test="UserEmail!=null and UserEmail!=''">
+			AND user.USER_EMAIL = #{UserEmail} 
+		</if>
+		<if test="UserID!=null and UserID!=''">
+			AND user.USER_ID = ${UserID} 
+		</if>
+		<if test="UserLevel!=null and UserLevel!=''">
+			AND user.USER_LEVEL = ${UserLevel} 
+		</if>
+		ORDER BY USER_ID LIMIT ${Page},10;
+	</select>
+	
+	<select id="getUserCount" resultType="java.lang.Integer" >
+		SELECT 
+			COUNT(1)
+		FROM `astringent`.`a_user` user
+		LEFT JOIN `astringent`.`a_miscellaneous` misc 
+		ON misc.CATEGROY = 1 AND user.USER_LEVEL = misc.DATA_ID 
+		WHERE 1=1
+		<if test="UserName!=null and UserName!=''">
+			AND user.USER_NAME LIKE CONCAT('%',#{UserName},'%') 
+		</if>
+		<if test="UserEmail!=null and UserEmail!=''">
+			AND user.USER_EMAIL = #{UserEmail} 
+		</if>
+		<if test="UserID!=null and UserID!=''">
+			AND user.USER_ID = ${UserID} 
+		</if>
+		<if test="UserLevel!=null and UserLevel!=''">
+			AND user.USER_LEVEL = ${UserLevel} 
+		</if>
+	</select>
+	<delete id="deleteUser">
+		DELETE FROM `astringent`.`a_user` 
+		WHERE  `USER_ID`=#{UserID} 
+		AND USER_LEVEL=1 
+		AND NOT EXISTS(SELECT USER_ID from a_resources WHERE USER_ID=#{UserID}) 
+		AND NOT EXISTS(SELECT USER_ID from a_comment WHERE USER_ID=#{UserID}) 
+		AND NOT EXISTS(SELECT USER_ID from a_attention WHERE USER_ID=#{UserID} OR USER_FOLLOWED=#{UserID})
+	</delete>
+	
+</mapper>

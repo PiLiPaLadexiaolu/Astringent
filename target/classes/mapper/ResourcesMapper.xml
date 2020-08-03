@@ -1,0 +1,531 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN"  
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="vip.pilipala.dao.ResourcesMapper">
+
+	<resultMap type="vip.pilipala.model.Resources" id="ResourcesMap">
+		<id property="resID" column="RES_ID" />
+		<result property="userID" column="USER_ID" />
+		<result property="resTitle" column="RESOURCES_TITLE" />
+		<result property="resLabel" column="RESOURCES_LABEL" />
+		<result property="resContent" column="RESOURCES_CONTENT" />
+		<result property="resMarkDown" column="RESOURCES_MARKDOWN" />
+		<result property="resSrc" column="RESOURCES_SRC" />
+		<result property="resCoverSrc" column="RESOURCES_COVER_SRC" />
+		<result property="uploadTime" column="UPLOAD_TIME" />
+		<result property="checkNumber" column="CHECK_NUMBER" />
+		<result property="resType" column="RESOURCES_TYPE" />
+		
+	</resultMap>
+	
+	<insert id="insertVideoResource" parameterType="java.util.Map">
+		INSERT INTO 
+			`astringent`.`a_resources` 
+			(
+			`RES_ID`,
+			`USER_ID`,
+			`RESOURCES_TITLE`,
+			`RESOURCES_CONTENT`,
+			`RESOURCES_MARKDOWN`,
+			`RESOURCES_SRC`,
+			`RESOURCES_COVER_SRC`,
+			`UPLOAD_TIME`,
+			`CHECK_NUMBER`,
+			`RESOURCES_TYPE`,
+			`RESOURCES_LABEL`
+			) 
+		VALUES 
+			(
+			#{ResID},
+			#{UserID},
+			#{ResTitle},
+			#{ResContent},
+			#{ResMark},
+			#{ResSrc},
+			#{ResCoverSrc},
+			now(),
+			'0',
+			'1',
+			#{ResLabel}
+			)
+	</insert>
+	
+	<insert id="insertOtherResource" parameterType="java.util.Map">
+		INSERT INTO 
+			`astringent`.`a_resources` 
+			(
+			`RES_ID`,
+			`USER_ID`,
+			`RESOURCES_TITLE`,
+			`RESOURCES_CONTENT`,
+			`RESOURCES_MARKDOWN`,
+			`RESOURCES_SRC`,
+			`RESOURCES_COVER_SRC`,
+			`UPLOAD_TIME`,
+			`CHECK_NUMBER`,
+			`RESOURCES_TYPE`,
+			`RESOURCES_LABEL`
+			) 
+		VALUES 
+			(
+			#{ResID},
+			#{UserID},
+			#{ResTitle},
+			#{ResContent},
+			#{ResMark},
+			#{ResSrc},
+			#{ResCoverSrc},
+			now(),
+			'0',
+			#{ResType},
+			#{ResLabel}
+			)
+	</insert>
+		
+		
+	<insert id="insertFile" parameterType="java.util.Map">
+		INSERT INTO 
+			`astringent`.`a_flie` 
+			(
+			`RES_ID`,
+			`FILE_NAME`,
+			`FILE_INDEX`,
+			`FILE_TYPE`
+			) 
+		VALUES
+			(
+			#{ResID},
+			#{FileName},
+			#{FileNumber},
+			#{FileType}
+			)
+	</insert>
+	
+	<select id="getVideoFileInfo" resultType="java.util.Map">SELECT `FILE_ID`,  `RES_ID`,  `FILE_NAME`,  `FILE_INDEX`,  `FILE_TYPE` FROM `astringent`.`a_flie` WHERE RES_ID=#{VideoID} AND FILE_INDEX = #{VideoIndex}</select>
+	
+	<select id="getVideoInfoCount" resultType="java.lang.Integer">SELECT COUNT(1) VIDEO_COUNT FROM `astringent`.`a_flie` WHERE RES_ID=#{VideoID}</select>
+	
+	
+	<select id="getVideoResourcesInfo" resultType="java.util.Map">
+		SELECT 
+			res.RES_ID RES_ID,
+			user.USER_ID USER_ID,
+			res.RESOURCES_TITLE RESOURCES_TITLE,
+			res.RESOURCES_LABEL RESOURCES_LABEL,
+			res.RESOURCES_TYPE RESOURCES_TYPE_ID,
+			res.RESOURCES_CONTENT RESOURCES_CONTENT,
+			res.RESOURCES_MARKDOWN RESOURCES_MARKDOWN,
+			DATE_FORMAT(res.UPLOAD_TIME,'%y-%m-%d') UPLOAD_TIME,
+			res.CHECK_NUMBER CHECK_NUMBER,
+			user.USER_NAME,
+			user.USER_DESCRIPTION,
+			misc_one.DATA_INFO USER_LEVEL,
+			misc_two.DATA_INFO RESOURCES_TYPE,
+			(SELECT COUNT(1) FROM a_resources res WHERE res.USER_ID=user.USER_ID) RESOURCES_NUMBER
+		FROM a_resources res
+			LEFT JOIN a_user USER ON res.USER_ID=user.USER_ID
+			LEFT JOIN a_miscellaneous misc_one ON misc_one.CATEGROY=1 AND user.USER_LEVEL=misc_one.DATA_ID
+			LEFT JOIN a_miscellaneous misc_two ON misc_two.CATEGROY=2 AND res.RESOURCES_TYPE=misc_two.DATA_ID
+			WHERE RES_ID=#{ResID}
+	</select>
+	
+	<select id="getResourcesRandomList" resultType="java.util.Map">
+		SELECT
+			RES_ID RES_ID,
+			user.USER_NAME USER_NAME,
+			user.USER_ID USER_ID,
+			RESOURCES_TITLE RESOURCES_TITLE,
+			RESOURCES_SRC RESOURCES_SRC,
+			RESOURCES_COVER_SRC RESOURCES_COVER_SRC,
+			DATE_FORMAT(UPLOAD_TIME,'%y-%m-%d') UPLOAD_TIME,
+			CHECK_NUMBER CHECK_NUMBER,
+			RESOURCES_TYPE RESOURCES_TYPE
+		FROM a_resources res 
+			LEFT JOIN a_user user ON user.USER_ID=res.USER_ID
+			WHERE res.RESOURCES_TYPE=#{ResType} 
+			ORDER BY RAND() limit 0,10
+	</select>
+	
+	<select id="getUserResourcesRandomList" resultType="java.util.Map">
+		SELECT 
+			RES_ID RES_ID,
+			user.USER_NAME USER_NAME,
+			user.USER_ID USER_ID,
+			RESOURCES_TITLE RESOURCES_TITLE,
+			RESOURCES_SRC RESOURCES_SRC,
+			RESOURCES_COVER_SRC RESOURCES_COVER_SRC,
+			DATE_FORMAT(UPLOAD_TIME,'%y-%m-%d') UPLOAD_TIME,
+			CHECK_NUMBER CHECK_NUMBER,
+			RESOURCES_TYPE RESOURCES_TYPE
+		FROM a_resources res 
+			LEFT JOIN a_user user ON user.USER_ID=res.USER_ID 
+		WHERE 
+			res.USER_ID =(SELECT USER_ID FROM a_resources  WHERE RES_ID = #{ResID}) 
+		AND 
+			res.RESOURCES_TYPE = (SELECT RESOURCES_TYPE FROM a_resources  WHERE RES_ID = #{ResID})
+		ORDER BY RAND() limit 0,10
+	</select>
+	
+	<select id="getUserResourcesList" resultType="java.util.Map">
+		SELECT
+			RES_ID RES_ID,
+			user.USER_NAME USER_NAME,
+			user.USER_ID USER_ID,
+			RESOURCES_TITLE RESOURCES_TITLE,
+			RESOURCES_LABEL RESOURCES_LABEL,
+			RESOURCES_SRC RESOURCES_SRC,
+			RESOURCES_COVER_SRC RESOURCES_COVER_SRC,
+			DATE_FORMAT(UPLOAD_TIME,'%y-%m-%d %H:%i:%s') UPLOAD_TIME,
+			RESOURCES_TYPE RESOURCES_TYPE,
+			(SELECT COUNT(1) FROM a_comment comm WHERE comm.RESOURCES_ID=res.RES_ID) COMMENT_NUMBER,
+			(SELECT COUNT(1) FROM a_flie fi WHERE fi.RES_ID=res.RES_ID) FILE_NUMBER,
+			res.CHECK_NUMBER CHECK_NUMBER
+		FROM a_resources res 
+			LEFT JOIN a_user user ON user.USER_ID=res.USER_ID
+			WHERE res.RESOURCES_TYPE= #{ResType}
+			AND res.USER_ID=#{UserID}
+			ORDER BY UPLOAD_TIME DESC 
+			limit ${Page},10
+	</select>
+	
+	<select id="getUserResourcesNumber" resultType="java.lang.Integer">
+		SELECT
+			COUNT(1) RESOURCES_NUMBER
+		FROM a_resources res 
+			LEFT JOIN a_user user ON user.USER_ID=res.USER_ID
+			WHERE res.RESOURCES_TYPE= #{ResType}
+			AND res.USER_ID=#{UserID}
+	</select>
+	
+	<select id="findResourcesByResIDAndUserID" resultMap="ResourcesMap" resultType="vip.pilipala.model.Resources" >
+		SELECT 
+			RES_ID, 
+			USER_ID, 
+			RESOURCES_TITLE, 
+			RESOURCES_LABEL, 
+			RESOURCES_CONTENT, 
+			RESOURCES_MARKDOWN, 
+			RESOURCES_SRC, 
+			RESOURCES_COVER_SRC, 
+			UPLOAD_TIME, 
+			CHECK_NUMBER, 
+			RESOURCES_TYPE 
+		FROM a_resources 
+		WHERE USER_ID = #{UserID}
+		AND
+		RES_ID = #{ResID}
+	</select>
+	
+	<delete id="deleteResourcesById">
+		DELETE FROM a_resources WHERE RES_ID = #{ResID}
+	</delete>
+	
+	<delete id="deleteResourcesFileById">
+		DELETE FROM a_flie WHERE RES_ID = #{ResID}
+	</delete>
+	
+	<insert id="insertArticleResource" parameterType="java.util.Map">
+	INSERT INTO 
+		`astringent`.`a_resources` 
+		(
+		`RES_ID`,
+		`USER_ID`,
+		`RESOURCES_TITLE`,
+		`RESOURCES_CONTENT`,
+		`RESOURCES_MARKDOWN`,
+		`RESOURCES_SRC`,
+		`RESOURCES_COVER_SRC`,
+		`UPLOAD_TIME`,
+		`CHECK_NUMBER`,
+		`RESOURCES_TYPE`,
+		`RESOURCES_LABEL`
+		) 
+	VALUES 
+		(
+		#{ResID},
+		#{UserID},
+		#{ResTitle},
+		#{ResContent},
+		#{ResMark},
+		#{ResSrc},
+		#{ResCoverSrc},
+		now(),
+		'0',
+		'2',
+		#{ResLabel}
+		)
+	</insert>
+	
+	 
+	 <update id="updataResourcesCheck" parameterType="java.util.Map">
+	 	UPDATE `astringent`.`a_resources`  SET `CHECK_NUMBER`=`CHECK_NUMBER`+1 WHERE  `RES_ID`=#{ResID};
+	 </update>
+	 
+	 <select id="getResourcesFileMap" resultType="java.util.Map" parameterType="java.util.Map">
+		SELECT 
+			`FILE_ID` FILE_ID,
+			`RES_ID` RES_ID, 
+			`FILE_NAME` FILE_NAME, 
+			`FILE_INDEX` FILE_INDEX, 
+			`FILE_TYPE` FILE_TYPE 
+		FROM 
+			`astringent`.`a_flie` 
+		WHERE RES_ID= #{ResID};
+	</select>
+	
+	 <select id="getResourcesTypeMap" resultType="java.util.Map" >
+		SELECT `CATEGROY`,  `DATA_ID`, `DATA_INFO` FROM `astringent`.`a_miscellaneous` WHERE CATEGROY=2;
+	</select>
+	
+	 <select id="getOtherResourcesTypeMap" resultType="java.util.Map" >
+		SELECT `CATEGROY`,  `DATA_ID`, `DATA_INFO` FROM `astringent`.`a_miscellaneous` WHERE CATEGROY=2 AND DATA_ID != 1 AND DATA_ID != 2;
+	</select>
+	
+	<select id="getOpResourcesCount" resultType="java.lang.Integer" >
+		SELECT
+				COUNT(1) RESOURCES_NUMBER
+		FROM a_resources res 
+				LEFT JOIN a_user user ON user.USER_ID=res.USER_ID
+		WHERE res.RESOURCES_TYPE= #{ResType}
+		<if test="UserID!=null and UserID!=''">
+			AND user.USER_ID=#{UserID} 
+		</if>
+		<if test="ResName!=null and ResName!=''">
+			AND res.RESOURCES_TITLE LIKE CONCAT('%',#{ResName},'%') 
+		</if>
+	</select>
+	
+	<select id="getOpResourcesList" resultType="java.util.Map" >
+		SELECT
+				RES_ID RES_ID,
+				user.USER_NAME USER_NAME,
+				user.USER_ID USER_ID,
+				RESOURCES_TITLE RESOURCES_TITLE,
+				RESOURCES_LABEL RESOURCES_LABEL,
+				RESOURCES_SRC RESOURCES_SRC,
+				RESOURCES_COVER_SRC RESOURCES_COVER_SRC,
+				DATE_FORMAT(UPLOAD_TIME,'%y-%m-%d %H:%i:%s') UPLOAD_TIME,
+				RESOURCES_TYPE RESOURCES_TYPE,
+				(SELECT COUNT(1) FROM a_comment comm WHERE comm.RESOURCES_ID=res.RES_ID) COMMENT_NUMBER,
+				(SELECT COUNT(1) FROM a_flie fi WHERE fi.RES_ID=res.RES_ID) FILE_NUMBER,
+				res.CHECK_NUMBER CHECK_NUMBER
+		FROM a_resources res 
+				LEFT JOIN a_user user ON user.USER_ID=res.USER_ID
+		WHERE res.RESOURCES_TYPE= #{ResType}
+		<if test="UserID!=null and UserID!=''">
+			AND user.USER_ID=#{UserID} 
+		</if>
+		<if test="ResName!=null and ResName!=''">
+			AND res.RESOURCES_TITLE LIKE CONCAT('%',#{ResName},'%') 
+		</if>
+		ORDER BY res.UPLOAD_TIME DESC 
+		LIMIT ${Page},10
+	</select>
+	
+	<select id="findResourcesByResID" resultMap="ResourcesMap" resultType="vip.pilipala.model.Resources" >
+		SELECT 
+			RES_ID, 
+			USER_ID, 
+			RESOURCES_TITLE, 
+			RESOURCES_LABEL, 
+			RESOURCES_CONTENT, 
+			RESOURCES_MARKDOWN, 
+			RESOURCES_SRC, 
+			RESOURCES_COVER_SRC, 
+			UPLOAD_TIME, 
+			CHECK_NUMBER, 
+			RESOURCES_TYPE 
+		FROM a_resources 
+		WHERE RES_ID = #{ResID}
+	</select>
+	
+	<select id="getResourcesTop5List" resultType="java.util.Map">
+		SELECT
+			RES_ID RES_ID,
+			user.USER_NAME USER_NAME,
+			user.USER_ID USER_ID,
+			RESOURCES_TITLE RESOURCES_TITLE,
+			RESOURCES_SRC RESOURCES_SRC,
+			RESOURCES_COVER_SRC RESOURCES_COVER_SRC,
+			DATE_FORMAT(UPLOAD_TIME,'%y-%m-%d') UPLOAD_TIME,
+			CHECK_NUMBER CHECK_NUMBER,
+			RESOURCES_TYPE RESOURCES_TYPE
+		FROM a_resources res 
+			LEFT JOIN a_user user ON user.USER_ID=res.USER_ID
+			WHERE res.RESOURCES_TYPE=#{ResType} 
+			ORDER BY res.CHECK_NUMBER DESC limit 0,5
+	</select>
+	
+	<insert id="insertCarousel" parameterType="java.util.Map">
+		INSERT INTO `astringent`.`a_carousel` (`NUMBER`, `IMG_URL`, `IMG_TITLE`, `LINK`) VALUES (${NUMBER}, #{IMG_URL}, #{IMG_TITLE}, #{LINK});
+	</insert>
+	
+	<select id="getCarouselList" resultType="java.util.Map">
+		SELECT  `NUMBER` NUMBER,  `IMG_URL` IMG_URL, `IMG_TITLE` IMG_TITLE, `LINK` LINK FROM `astringent`.`a_carousel` ORDER BY NUMBER ASC;
+	</select>
+	
+	<delete id="deleteCarouselByNumber">
+		DELETE FROM `astringent`.`a_carousel` WHERE  `NUMBER`=${NUMBER};
+	</delete>
+	
+	<select id="getSearchResourcesList" resultType="java.util.Map">
+		SELECT 
+			res.RES_ID RES_ID,
+			user.USER_ID USER_ID,
+			res.RESOURCES_TITLE RESOURCES_TITLE,
+			res.RESOURCES_LABEL RESOURCES_LABEL,
+			res.RESOURCES_CONTENT RESOURCES_CONTENT,
+			res.RESOURCES_COVER_SRC RESOURCES_COVER_SRC,
+			res.RESOURCES_MARKDOWN RESOURCES_MARKDOWN,
+			DATE_FORMAT(res.UPLOAD_TIME,'%y-%m-%d') UPLOAD_TIME,
+			res.CHECK_NUMBER CHECK_NUMBER,
+			user.USER_NAME,
+			user.USER_DESCRIPTION,
+			misc_one.DATA_INFO USER_LEVEL,
+			misc_two.DATA_INFO RESOURCES_TYPE,
+			(SELECT COUNT(1) FROM a_resources res WHERE res.USER_ID=user.USER_ID) RESOURCES_NUMBER
+		FROM a_resources res
+			LEFT JOIN a_user USER ON res.USER_ID=user.USER_ID
+			LEFT JOIN a_miscellaneous misc_one ON misc_one.CATEGROY=1 AND user.USER_LEVEL=misc_one.DATA_ID
+			LEFT JOIN a_miscellaneous misc_two ON misc_two.CATEGROY=2 AND res.RESOURCES_TYPE=misc_two.DATA_ID
+			WHERE res.RESOURCES_TYPE = ${ResType}
+			<if test="SearchChar!=null and SearchChar!=''">
+			AND
+			(res.RESOURCES_LABEL LIKE CONCAT('%',#{SearchChar},'%') 
+			OR
+			res.RESOURCES_TITLE LIKE CONCAT('%',#{SearchChar},'%') 
+			OR user.USER_NAME LIKE CONCAT('%',#{SearchChar},'%') )
+			</if>
+			
+			<if test="(Check!=null and Check!='') and (Time!=null and Time!='')">
+			ORDER BY res.CHECK_NUMBER ${Check} ,res.UPLOAD_TIME ${Time} 
+			</if>
+			
+			<if test="Check!=null and Check!='' and (Time==null or Time=='')">
+			ORDER BY res.CHECK_NUMBER ${Check}
+			</if>
+			
+			<if test="Time!=null and Time!='' and (Check==null or Check=='')">
+			ORDER BY res.UPLOAD_TIME ${Time}
+			</if>
+			 
+			LIMIT ${Page},${PageLength}
+	</select>
+	
+	<select id="getSearchResourcesCount" resultType="java.lang.Integer">
+		SELECT 
+			COUNT(1) NUMBER
+		FROM a_resources res
+			LEFT JOIN a_user USER ON res.USER_ID=user.USER_ID
+			LEFT JOIN a_miscellaneous misc_one ON misc_one.CATEGROY=1 AND user.USER_LEVEL=misc_one.DATA_ID
+			LEFT JOIN a_miscellaneous misc_two ON misc_two.CATEGROY=2 AND res.RESOURCES_TYPE=misc_two.DATA_ID
+			WHERE res.RESOURCES_TYPE = ${ResType}
+			<if test="SearchChar!=null and SearchChar!=''">
+			AND
+			(res.RESOURCES_TITLE LIKE CONCAT('%',#{SearchChar},'%') 
+			OR
+			res.RESOURCES_TITLE LIKE CONCAT('%',#{SearchChar},'%') 
+			OR user.USER_NAME LIKE CONCAT('%',#{SearchChar},'%') )
+			</if>
+	</select>
+	
+	<select id="findUserResourceStatistics" resultType="java.util.Map">
+		SELECT 
+			COUNT(1) ALL_RESOURCES,
+			SUM(res.RESOURCES_TYPE='1') VIDEO_RESOURCES,
+			SUM(res.RESOURCES_TYPE='2') ARTICLE_RESOURCES,
+			SUM(res.RESOURCES_TYPE='3') OTHER_RESOURCES,
+			SUM(res.RESOURCES_TYPE='4') BOOK_RESOURCES,
+			SUM(res.RESOURCES_TYPE='5') SOFTWARE_RESOURCES,
+			SUM(res.RESOURCES_TYPE='6') CODE_RESOURCES
+		FROM a_resources res where res.USER_ID=#{UserID};
+	</select>
+	
+	<insert id="insertReport" parameterType="java.util.Map">
+		INSERT INTO `astringent`.`a_report` (`RESOURCES_ID`, `REPORT_CONTENT`) VALUES (#{ResID}, #{ReportContent});
+	</insert>
+	
+	<select id="getReportList" resultType="java.util.Map">
+			SELECT 
+				rep.REPORT_ID REPORT_ID,
+				res.RES_ID RES_ID,
+				rep.REPORT_CONTENT REPORT_CONTENT,
+				DATE_FORMAT(rep.REPORT_TIME,'%y-%m-%d') REPORT_TIME,
+				res.RESOURCES_TITLE RESOURCES_TITLE,
+				res.RESOURCES_TYPE RESOURCES_TYPE,
+				res.USER_ID USER_ID
+			FROM a_report rep LEFT JOIN a_resources res ON rep.RESOURCES_ID = res.RES_ID
+			WHERE 1=1
+			<if test="ResTitle!=null and ResTitle!=''">
+				AND res.RESOURCES_TITLE LIKE CONCAT('%',#{ResTitle},'%') 
+			</if>
+			<if test="ResType!=null and ResType!=''">
+				AND res.RESOURCES_TYPE = ${ResType}
+			</if>
+			<if test="ReportContent!=null and ReportContent!=''">
+				AND rep.REPORT_CONTENT LIKE CONCAT('%',#{ReportContent},'%') 
+			</if>
+			ORDER BY rep.REPORT_TIME 
+			LIMIT ${Page},10
+	</select>
+	
+	<select id="getReportCount" resultType="java.lang.Integer">
+			SELECT 
+				COUNT(1)
+			FROM a_report rep LEFT JOIN a_resources res ON rep.RESOURCES_ID = res.RES_ID
+			WHERE 1=1
+			<if test="ResTitle!=null and ResTitle!=''">
+				AND res.RESOURCES_TITLE LIKE CONCAT('%',#{ResTitle},'%') 
+			</if>
+			<if test="ResType!=null and ResType!=''">
+				AND res.RESOURCES_TYPE = ${ResType}
+			</if>
+			<if test="ReportContent!=null and ReportContent!=''">
+				AND rep.REPORT_CONTENT LIKE CONCAT('%',#{ReportContent},'%') 
+			</if>
+	</select>
+	
+	<delete id="deleteReport">
+		DELETE FROM `astringent`.`a_report` WHERE  `REPORT_ID`= #{ReportID};
+	</delete>
+	
+	<delete id="deleteReportByResID">
+		DELETE FROM `astringent`.`a_report` WHERE  `RESOURCES_ID`= #{ResID};
+	</delete>
+	
+	<insert id="insertHistory">
+		INSERT INTO `astringent`.`a_history` (`USER_ID`, `RESOURCES_ID`) VALUES (${UserID}, #{ResID});
+	</insert>
+	
+	<insert id="updateHistory">
+		UPDATE `astringent`.`a_history` SET `HISTORY_TIME`= now() WHERE USER_ID = ${UserID} AND RESOURCES_ID = #{ResID};
+	</insert>
+	
+	<delete id="deleteHistory">
+		DELETE FROM `astringent`.`a_history`;
+	</delete>
+	
+	<select id="selectHistory" resultType="java.util.Map">
+		SELECT hist.ID ID, 
+			DATE_FORMAT(hist.HISTORY_TIME,'%y-%m-%d %H:%i:%s') HISTORY_TIME, 
+			res.RESOURCES_TITLE RESOURCES_TITLE, 
+			res.RESOURCES_COVER_SRC RESOURCES_COVER_SRC, 
+			res.CHECK_NUMBER CHECK_NUMBER, 
+			res.RESOURCES_TYPE RESOURCES_TYPE, 
+			misc.DATA_INFO DATA_INFO,
+			res.RES_ID RES_ID 
+		FROM a_history hist LEFT JOIN a_resources res ON res.RES_ID = hist.RESOURCES_ID 
+		LEFT JOIN a_miscellaneous misc ON misc.CATEGROY=2 AND misc.DATA_ID = res.RESOURCES_TYPE
+		WHERE hist.USER_ID = #{UserID}
+		ORDER BY hist.HISTORY_TIME DESC
+		LIMIT 0,20
+	</select>
+	
+	<select id="findHistoryByUserIDAndResID" resultType="java.lang.Integer">
+		SELECT 
+			COUNT(1)
+		FROM a_history hist 
+		WHERE USER_ID = ${UserID} AND RESOURCES_ID = #{ResID}
+	</select>
+</mapper>

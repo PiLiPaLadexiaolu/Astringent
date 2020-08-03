@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<link rel="stylesheet" type="text/css" href="./css/iview.css">
+		<link rel="stylesheet" type="text/css" href="./css/animate.css">
+		<link rel="stylesheet" href="./css/search.css">
+		<link rel="stylesheet" href="./css/article.css">
+		<link rel="stylesheet" type="text/css" href="./css/Test.css">
+		<link rel="shortcut icon" href="./images/favicon.ico">
+		
+		<title>Test</title>
+		
+	</head>
+	<body>
+		<div id="app" v-cloak>
+			<div class="main-head">
+				<div class="head-logo">
+					<a href=""><img width="60px" height="60px" src="./images/logo.png" title="PiLiPaLa"/></a>
+				</div>
+				<div class="head-left">
+					<ul class="list-ul">
+						<li class="list-li"><a class="list-font" href="#home">网站首页</a></li>
+						<li class="list-li"><a class="list-font" href="#news">PDF资源</a></li>
+						<li class="list-li"><a class="list-font" href="#contact">视频资源</a></li>
+						<li class="list-li"><a class="list-font" href="#about">源码资源</a></li>
+						<li class="list-li"><a class="list-font" href="#about">其他资源</a></li>
+					</ul>
+				</div>
+				
+				<div class="search-box">
+					<i-input type="text" v-model="resources" @on-enter="searchEvents" placeholder="搜索资源名..." ></i-input><span></span>
+				</div>
+				
+				<div class="head-right">
+					<ul v-if="name==''" class="list-ul">
+						<li class="list-li">
+							<a href="login.html" class="list-font a-ordinary">登录 | 注册</a>
+						</li>
+					</ul>
+					<ul v-else class="list-ul">
+						<li class="list-li">
+							<a href="" class="list-font a-ordinary">个人中心</a>
+						</li>
+						<li class="list-li">
+							<a href="#" class="list-font a-ordinary">{{name}}</a>
+						</li>
+						<li class="list-li">
+							<a href="userOut" class="list-font a-ordinary">退出</a>
+						</li>
+					</ul>
+				</div>
+				
+			</div>
+			
+			<div class="main-content">
+				
+			</div>
+		</div>
+	<script src="./js/vue.js"></script>
+	<script src="./js/iview.min.js"></script>
+	<script src="./js/en-US.js"></script>
+	<script src="./js/zh-CN.js"></script>
+	<script src="./js/vue-i18n.js"></script>
+	<script src="./js/axios.min.js"></script>
+	<script src="./js/qs.min.js"></script>
+	<script src="./js/md5.min.js"></script>
+	<script src="./js/Test.js"></script>
+	<script src="./js/search.js"></script>
+	<script type="text/javascript" src="./js/jquery-3.4.1.min.js"></script>
+	<script type="text/javascript" src="./js/mditor.js"></script>
+	
+	</body>
+</html>

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<link rel="stylesheet" type="text/css" href="./css/iview.css">
+		<link rel="stylesheet" type="text/css" href="./css/animate.css">
+		<link rel="stylesheet" href="./css/search.css">
+        <link rel="stylesheet" href="./css/article.css">
+        <link rel="stylesheet" type="text/css" href="./css/same.css">
+		<link rel="stylesheet" type="text/css" href="./css/home.css">
+		<link rel="shortcut icon" href="./images/favicon.ico">
+		
+		<title>个人中心</title>
+		
+	</head>
+	<body>
+		<div id="app" v-cloak>
+			<div class="main-head">
+				<div class="head-logo">
+					<a href="index.html"><img width="60px" height="60px" src="./images/logo.png" title="PiLiPaLa"/></a>
+				</div>
+				<div class="head-left">
+					<ul class="list-ul">
+						<li class="list-li"><a class="list-font a-ordinary" href="index.html">网站首页</a></li>
+						<li class="list-li"><a class="list-font a-ordinary" href="search.html?label=video">视频资源</a></li>
+						<li class="list-li"><a class="list-font a-ordinary" href="search.html?label=article">文章专栏</a></li>
+						<li class="list-li"><a class="list-font a-ordinary" href="search.html?label=code">项目源码</a></li>
+						<li class="list-li"><a class="list-font a-ordinary" href="search.html?label=book">书籍文档</a></li>
+						<li class="list-li"><a class="list-font a-ordinary" href="search.html?label=software">工具软件</a></li>
+						<li class="list-li"><a class="list-font a-ordinary" href="search.html?label=other">其他资源</a></li>
+					</ul>
+				</div>
+				
+				<div class="search-box">
+					<i-input type="text" v-model="resources" @on-enter="searchEvents" placeholder="搜索资源名,用户名..." ></i-input><span></span>
+				</div>
+				
+				<div class="head-right">
+					<ul v-if="name==''" class="list-ul">
+						<li class="list-li">
+							<a href="login.html" class="list-font a-ordinary">登录 | 注册</a>
+						</li>
+					</ul>
+					<ul v-else class="list-ul">
+						<li class="list-li">
+							<a href="home.html" class="list-font a-ordinary">个人中心</a>
+						</li>
+						<li class="list-li">
+							<tooltip max-width="200" content="(●ˇ∀ˇ●)点我！可以查看历史记录哦!">
+								<a @click="historySwitch" class="list-font a-ordinary">{{name}}</a>
+							</tooltip>
+						</li>
+						<li class="list-li">
+							<a @click="userOut" class="list-font a-ordinary">退出</a>
+						</li>
+					</ul>
+				</div>
+				
+			</div>
+			
+			<div class="main-content">
+				<row class="row-Occupy">
+                    <i-col span="4" class="list-background">
+                        <i-menu @on-select="selectMeun" :active-name="$route.path">
+                            
+                            <menu-item name="/" to="/">
+                                <icon type="md-home" size="24" ></icon>
+                                首页
+                            </menu-item>
+                            <menu-item name="/personalInformation" to="/personalInformation" v-bind:lang="name">
+                                <icon type="md-person" size="24" ></icon>
+                                个人信息
+                            </menu-item>
+                            
+                            <submenu name="1">
+                                <template slot="title">
+                                    <icon type="md-filing" size="24"></icon>
+                                    资源管理
+                                </template>
+                                <menu-item name="/articleManagement" to="/articleManagement">文章资源管理</menu-item>
+                                <menu-item name="/videoManagement" to="/videoManagement">视频资源管理</menu-item>
+                                <menu-item name="/otherManagement" to="/otherManagement">文档、软件等其他资源管理</menu-item>
+                            </submenu>
+                            
+                            <submenu name="2">
+                                <template slot="title">
+                                    <icon type="md-glasses" size="24"></icon>
+                                关注管理
+                                </template>
+                                <menu-item name="/followMe" to="/followMe">关注我的</menu-item>
+                                <menu-item name="/iFollow" to="/iFollow">我关注的</menu-item>
+                            </submenu>
+                            
+                              <submenu name="3">
+                                <template slot="title">
+                                    <icon type="md-clipboard" size="24"></icon>
+                                    评论管理
+                                </template>
+                                <menu-item name="/readReviews" to="/readReviews">查看给我的评论</menu-item>
+                                <menu-item name="/myComment" to="/myComment">我的评论</menu-item>
+                            </submenu>
+                            
+                            <submenu name="4">
+                                <template slot="title">
+                                    <icon type="md-cloud-upload" size="24"></icon>
+                                    上传资源
+                                </template>
+                                <menu-group title="视频">
+                                    <menu-item name="/videoResourceUpload" to="/videoResourceUpload">视频资源</menu-item>
+                                </menu-group>
+                                <menu-group title="书籍、软件、源码、其他">
+                                    <menu-item name="/otherResourceUpload" to="/otherResourceUpload">书籍、软件、源码或其他资源</menu-item>
+                                </menu-group>
+                                <menu-group title="文章">
+                                    <menu-item name="/articleResourceUpload" to="/articleResourceUpload">编写文章</menu-item>
+                                </menu-group>
+                            </submenu>
+                            
+                            <submenu name="5" v-if="userInfo.userLevel == 5">
+                                <template slot="title">
+                                    <icon type="md-folder" size="24"></icon>
+                                    (管理员)资源管理
+                                </template>
+                                <menu-item name="/opArticleManagement" to="/opArticleManagement">文章资源管理</menu-item>
+                                <menu-item name="/opVideoManagement" to="/opVideoManagement">视频资源管理</menu-item>
+                                <menu-item name="/opOtherManagement" to="/opOtherManagement">文档、软件等其他资源管理</menu-item>
+                            </submenu>
+                            
+                            <submenu name="6" v-if="userInfo.userLevel == 5">
+                                <template slot="title">
+                                    <icon type="md-chatboxes" size="24"></icon>
+                                    (管理员)互动管理
+                                </template>
+                                <menu-item name="/opCommentManagement" to="/opCommentManagement">评论管理</menu-item>
+                                <menu-item name="/opAttentionManagement" to="/opAttentionManagement">关注管理</menu-item>
+                                <menu-item name="/reportManagement" to="/reportManagement">举报管理</menu-item>
+                            </submenu>
+                            
+                            <submenu name="7" v-if="userInfo.userLevel == 5">
+                                <template slot="title">
+                                    <icon type="md-people" size="24"></icon>
+                                    (管理员)用户管理
+                                </template>
+                                <menu-item name="/opAddUser" to="/opAddUser">添加用户</menu-item>
+                                <menu-item name="/opUserManagement" to="/opUserManagement">管理用户</menu-item>
+                            </submenu>
+                            
+                            <submenu name="8" v-if="userInfo.userLevel == 5">
+                                <template slot="title">
+                                    <icon type="md-image" size="24"></icon>
+                                    (管理员)主页轮播管理
+                                </template>
+                                <menu-item name="/addCarousel" to="/addCarousel">添加轮播图</menu-item>
+                                <menu-item name="/carouselList" to="/carouselList">查看轮播</menu-item>
+                            </submenu>
+                           
+                            <menu-item @click.native="userOut" name="0-3">
+                                 <icon type="md-exit" size="24"></icon>
+                                  退出登录
+                           </menu-item>
+                        </i-menu>
+                        
+                    </i-col>
+                    <i-col span="20" style="height: 100%;">
+                        <div class="right-content">
+                            <router-view></router-view>
+                        </div>
+                    </i-col>
+                </row>
+                <Drawer title="浏览历史" :closable="false" width="450" v-model="history">
+					<div class="other-body-li" v-for="(item, index) in historyList" >
+						<a class="a-ordinary" v-bind:href="'other.html?name=' + item.RES_ID" v-if="item.RESOURCES_TYPE!=1&&item.RESOURCES_TYPE!=2">
+							<div class="other-li-img">
+								<img alt="Cover" v-bind:src="'getResourcesCover?CoverName=' + item.RESOURCES_COVER_SRC"/>
+							</div>
+							<div class="other-li-body">
+								<p style="padding-bottom: 5px; font-size: 16px; font-weight: 800;"  v-if="item.RESOURCES_TITLE==null||item.RESOURCES_TITLE==''">
+									该资源以被删除!
+								</p>
+								<p style="padding-bottom: 5px; font-size: 16px; font-weight: 800;"  v-else>
+									{{item.RESOURCES_TITLE}}
+								</p>
+								<p>
+									<span class="resources-span">
+										<icon type="md-time" ></icon>
+										<span>{{item.HISTORY_TIME}}</span>
+									</span>
+									<span class="resources-span">
+									<icon type="md-paper" ></icon>
+										<span>{{item.DATA_INFO}}</span>
+									</span>
+								</p>
+							</div>
+						</a>
+						<a class="a-ordinary" v-bind:href="'video.html?name=' + item.RES_ID" v-if="item.RESOURCES_TYPE==1">
+							<div class="other-li-img">
+								<img alt="Cover" v-bind:src="'getResourcesCover?CoverName=' + item.RESOURCES_COVER_SRC"/>
+							</div>
+							<div class="other-li-body">
+								<p style="padding-bottom: 5px; font-size: 16px; font-weight: 800;"  v-if="item.RESOURCES_TITLE==null||item.RESOURCES_TITLE==''">
+									该资源以被删除!
+								</p>
+								<p style="padding-bottom: 5px; font-size: 16px; font-weight: 800;"  v-else>
+									{{item.RESOURCES_TITLE}}
+								</p>
+								<p>
+									<span class="resources-span">
+										<icon type="md-time" ></icon>
+										<span>{{item.HISTORY_TIME}}</span>
+									</span>
+									<span class="resources-span">
+									<icon type="md-paper" ></icon>
+										<span>{{item.DATA_INFO}}</span>
+									</span>
+								</p>
+							</div>
+						</a>
+						<a class="a-ordinary" v-bind:href="'article.html?name=' + item.RES_ID" v-if="item.RESOURCES_TYPE==2">
+							<div class="other-li-body-all">
+								<p style="padding-bottom: 5px; font-size: 16px; font-weight: 800;"  v-if="item.RESOURCES_TITLE==null||item.RESOURCES_TITLE==''">
+									该资源以被删除!
+								</p>
+								<p style="padding-bottom: 5px; font-size: 16px; font-weight: 800;"  v-else>
+									{{item.RESOURCES_TITLE}}
+								</p>
+								<p>
+									<span class="resources-span">
+										<icon type="md-time" ></icon>
+										<span>{{item.HISTORY_TIME}}</span>
+									</span>
+									<span class="resources-span">
+									<icon type="md-paper" ></icon>
+										<span>{{item.DATA_INFO}}</span>
+									</span>
+								</p>
+							</div>
+						</a>
+					</div>
+    			</Drawer>
+			</div>
+		</div>
+    <script src="./js/vue.js"></script>
+    <script src="./js/vue-router.js"></script>
+	<script src="./js/iview.min.js"></script>
+	<script src="./js/en-US.js"></script>
+	<script src="./js/zh-CN.js"></script>
+	<script src="./js/vue-i18n.js"></script>
+	<script src="./js/axios.min.js"></script>
+	<script src="./js/qs.min.js"></script>
+	<script src="./js/md5.min.js"></script>
+	<script src="./js/search.js"></script>
+	<script src="./js/jquery-3.4.1.min.js"></script>
+	<script src="./js/mditor.js"></script>
+	<script src="./js/spark-md5.min.js"></script>
+	<script src="./js/home.js"></script>
+	</body>
+</html>

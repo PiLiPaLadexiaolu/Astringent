@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:p="http://www.springframework.org/schema/p" 
+	xmlns:context="http://www.springframework.org/schema/context" 
+	xmlns:mvc="http://www.springframework.org/schema/mvc" 
+	xsi:schemaLocation="http://www.springframework.org/schema/beans  
+                        http://www.springframework.org/schema/beans/spring-beans.xsd  
+                        http://www.springframework.org/schema/context  
+                        http://www.springframework.org/schema/context/spring-context.xsd  
+                        http://www.springframework.org/schema/mvc  
+                        http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+	<!-- 配置SpringMVC -->
+	
+	<!-- 根目录映射到首页 -->
+	<mvc:view-controller path="/" view-name="index"/>
+	<!--     必须有，否则会使requestMapping失效。 -->
+	<!-- location:指location指定的目录不要拦截，直接请求，这里指在根目录下的resources文件下的所有文件 -->
+	<!-- mapping:值在resources文件下的所有文件(**代表所有文件) -->
+	<!-- 所有意思就是在根目录下resources的所有文件不会被DispatcherServlet拦截，直接访问，当做静态资源交个Servlet处理 -->
+	<mvc:resources location="/WEB-INF/css/" mapping="/css/**"/>
+	<mvc:resources location="/WEB-INF/js/" mapping="/js/**"/>
+	<mvc:resources location="/WEB-INF/images/" mapping="/images/**"/>
+	<mvc:resources location="/WEB-INF/css/fonts/" mapping="/css/fonts/**"/>
+	<mvc:resources location="/" mapping="/**"/>
+	<!-- 1.开启SpringMVC注解模式 -->
+	<!-- 简化配置： 
+		(1)自动注册DefaultAnootationHandlerMapping,AnotationMethodHandlerAdapter 
+		(2)提供一些列：数据绑定，数字和日期的format @NumberFormat, @DateTimeFormat, xml,json默认读写支持 
+	-->
+	<mvc:annotation-driven/>
+	<!-- 2.静态资源默认servlet配置
+		(1)加入对静态资源的处理：js,gif,png
+		(2)允许使用"/"做整体映射
+	 -->
+	<!-- <mvc:default-servlet-handler default-servlet-name=""/> -->
+	 
+	 <!-- 3.配置jsp 显示ViewResolver -->
+<!-- 	 <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"> -->
+<!-- 	 	<property name="viewClass" value="org.springframework.web.servlet.view.JstlView" /> -->
+<!-- 	 	<property name="prefix" value="/WEB-INF/pages/" /> -->
+<!-- 	 	<property name="suffix" value=".jsp" /> -->
+<!-- 	 </bean> -->
+	 
+	 <bean id="viewResolverFtl" class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+        <property name="viewClass" value="org.springframework.web.servlet.view.freemarker.FreeMarkerView"/>
+        <property name="contentType" value="text/html; charset=UTF-8"/>
+        <property name="exposeRequestAttributes" value="true" />
+        <property name="exposeSessionAttributes" value="true" />
+        <property name="exposeSpringMacroHelpers" value="true" />
+        <property name="cache" value="true" />
+        <property name="suffix" value=".html" />
+        <property name="order" value="0"/>
+    </bean>
+    
+     <!-- 配置freeMarker的模板路径 -->
+    <bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+        <property name="templateLoaderPath" value="/WEB-INF/pages/"/>
+        <property name="defaultEncoding" value="UTF-8"/>
+        <property name="freemarkerSettings">
+            <props>
+                <prop key="template_update_delay">3600</prop>
+                <prop key="locale">zh_CN</prop>
+                <prop key="datetime_format">yyyy-MM-dd HH:mm:ss</prop>
+                <prop key="date_format">yyyy-MM-dd</prop>
+                <prop key="number_format">#.##</prop>
+            </props>
+        </property>
+    </bean>
+    <!-- 上传文件拦截，设置最大上传文件大小   10M=10*1024*1024(B)=10485760 bytes -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+	    <property name="defaultEncoding" value="utf-8"/>
+	    <property name="maxUploadSize" value="#{50*1024*1024}"/>
+	</bean>
+	
+	<!-- 4.扫描web相关的bean -->
+	<context:component-scan base-package="vip.pilipala.controller" />
+	<mvc:interceptors>
+		<!-- 多个拦截器，顺序执行 -->
+		<!-- 配置登陆拦截器 -->
+		<mvc:interceptor>
+		<!-- /** 表示所有的url，包括子url路径 -->
+			<mvc:mapping path="/*"/>
+			<bean class="vip.pilipala.interceptor.CookieInterceptor"></bean>
+		</mvc:interceptor>
+		
+		<mvc:interceptor>
+		<!-- /** 表示所有的url，包括子url路径 -->
+			<mvc:mapping path="/home.html"/>
+			<bean class="vip.pilipala.interceptor.LoginInterceptor"></bean>
+		</mvc:interceptor>
+	</mvc:interceptors>
+
+</beans>

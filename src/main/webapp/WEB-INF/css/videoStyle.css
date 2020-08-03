@@ -1,0 +1,122 @@
+@font-face {
+    font-family: 'HeydingsControlsRegular';
+    src: url('fonts/heydings_controls-webfont.eot');
+    src: url('fonts/heydings_controls-webfont.eot?#iefix') format('embedded-opentype'), url('fonts/heydings_controls-webfont.woff') format('woff'), url('fonts/heydings_controls-webfont.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+video {
+	width:100%;
+    height: 100%;
+    border: 2px solid #414549;
+}
+
+
+.player {
+    padding: 1px;
+    width:100%;
+    height: 100%;
+    background-color: #ffffff;
+    position:relative;  
+}
+
+.controls {
+    visibility: hidden;
+    opacity: 0.05;
+    width: 400px;
+    border-radius: 3px;
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    margin-left: -200px;
+    background-color: #414549;
+    box-shadow: 3px 3px 5px #414549;
+    transition: 1s all;
+    display: flex;
+}
+
+.controls>button,
+.controls {
+    background: linear-gradient(to bottom, #414549, #414549);
+}
+
+.player:hover .controls,
+player:focus .controls {
+    opacity: 1;
+}
+
+.controls>button:before {
+    font-family: HeydingsControlsRegular;
+    font-size: 20px;
+    position: relative;
+    content: attr(data-icon);
+    color: #aaa;
+    text-shadow: 1px 1px 0px black;
+}
+
+.play:before {
+    font-size: 22px;
+}
+
+.controls>button,
+.timer {
+    height: 38px;
+    line-height: 19px;
+    box-shadow: inset 0 -5px 25px rgba(0, 0, 0, 0.3);
+    border-right: 1px solid #414549;
+}
+
+.controls>button {
+    position: relative;
+    border: 0;
+    flex: 1;
+    outline: none;
+}
+
+.play {
+    border-radius: 3px 0 0 3px;
+}
+
+.fwd {
+    border-radius: 0 3px 3px 0;
+}
+
+.timer {
+    line-height: 38px;
+    font-size: 10px;
+    font-family: monospace;
+    text-shadow: 1px 1px 0px black;
+    color: white;
+    flex: 5;
+    position: relative;
+}
+
+.timer div {
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0.274);
+    left: 0;
+    top: 0;
+    width: 0;
+    height: 38px;
+    z-index: 2;
+}
+
+.timer span {
+    position: absolute;
+    z-index: 3;
+    left: 19px;
+}
+
+.controls>button:hover,
+button:focus {
+    box-shadow: inset 1px 1px 2px black;
+}
+
+.controls>button:active {
+    box-shadow: inset 3px 3px 2px black;
+}
+
+.active:before {
+    color: rgb(0, 0, 0);
+}

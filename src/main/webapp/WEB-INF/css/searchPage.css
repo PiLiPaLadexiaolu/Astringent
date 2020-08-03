@@ -1,0 +1,41 @@
+.main-content {
+    width: 100%;
+    min-width: 1536px;
+    margin: 80px auto 0 auto;
+    /* background-color: #31dfb9; */
+    /* box-shadow: 5px 5px 10px #d1d1d1 ; */
+    padding: auto;
+    padding-top: 20px;
+    
+}
+.block-card {
+    width: 1150px;
+    min-height: 800px;
+    padding: 10px;
+    margin: 0 auto;
+    background-color: rgb(255, 255, 255);
+    box-shadow: 5px 5px 10px #b4b4b4 ;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    /* background-color: rgb(255, 255, 255); */
+}
+.card-row {
+    padding: 20px 20px;
+    max-width: 1150px;
+    min-width: 1150px;
+}
+
+.span-piece {
+    display: inline-block;
+    width: 199px;
+    padding: 15px;
+    font-size: 18px;
+    font-weight: 800;
+    vertical-align:top;
+}
+.span-piece img:hover {
+    box-shadow: 5px 5px 10px #a3a3a3 ;
+    /* 全部动画变化时间 */
+    transition: all 0.6s;
+}

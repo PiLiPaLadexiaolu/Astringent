@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<link rel="stylesheet" type="text/css" href="./css/iview.css">
+		<link rel="stylesheet" type="text/css" href="./css/animate.css">
+		<link rel="stylesheet" href="./css/search.css">
+		<link rel="stylesheet" href="./css/article.css">
+		<link rel="stylesheet" type="text/css" href="./css/searchPage.css">
+		<link rel="stylesheet" href="./css/same.css">
+		<link rel="shortcut icon" href="./images/favicon.ico">
+		<title>来找找啊~</title>
+		
+	</head>
+	<style>
+	.ivu-list-item-meta-title {
+	 color:#66ccff;
+	}
+	</style>
+	<body>
+		<div id="app" v-cloak>
+			<div class="main-head">
+				<div class="head-logo">
+					<a href="index.html"><img width="60px" height="60px" src="./images/logo.png" title="PiLiPaLa"/></a>
+				</div>
+				<div class="head-left">
+					<ul class="list-ul">
+						<li class="list-li"><a class="list-font a-ordinary" href="index.html">网站首页</a></li>
+						<li class="list-li"><a class="list-font a-ordinary" href="search.html?label=video">视频资源</a></li>
+						<li class="list-li"><a class="list-font a-ordinary" href="search.html?label=article">文章专栏</a></li>
+						<li class="list-li"><a class="list-font a-ordinary" href="search.html?label=code">项目源码</a></li>
+						<li class="list-li"><a class="list-font a-ordinary" href="search.html?label=book">书籍文档</a></li>
+						<li class="list-li"><a class="list-font a-ordinary" href="search.html?label=software">工具软件</a></li>
+						<li class="list-li"><a class="list-font a-ordinary" href="search.html?label=other">其他资源</a></li>
+					</ul>
+				</div>
+				
+				<div class="search-box">
+					<i-input type="text" v-model="resources" @on-enter="searchEvents" placeholder="搜索资源名..." ></i-input><span></span>
+				</div>
+				
+				<div class="head-right">
+					<ul v-if="name==''" class="list-ul">
+						<li class="list-li">
+							<a href="login.html" class="list-font a-ordinary">登录 | 注册</a>
+						</li>
+					</ul>
+					<ul v-else class="list-ul">
+						<li class="list-li">
+							<a href="home.html" class="list-font a-ordinary">个人中心</a>
+						</li>
+						<li class="list-li">
+							<a href="#" class="list-font a-ordinary">{{name}}</a>
+						</li>
+						<li class="list-li">
+							<a @click="userOut" class="list-font a-ordinary">退出</a>
+						</li>
+					</ul>
+				</div>
+				
+			</div>
+			<div class="main-content">
+				<div class="block-card">
+					<div class="card-row" >
+						<row>
+							<i-col span="8">&nbsp;</i-col>
+							<i-col span="8">
+								<i-input search enter-button="搜索" v-model="searchChar" @on-search="searchBtn" placeholder="Search..." ></i-input>
+							</i-col>
+							<i-col span="8">&nbsp;</i-col>
+						</row>
+						
+					</div>
+					<div class="card-row font-p-type" >
+						<tabs value="video" :animated="false" v-model="tabs" @on-click="tabClick">
+							<tab-pane  label="视频" name="video">
+								<div class="card-row" >
+									<i-form  :label-width="120">
+										<form-item label="点击量排序:">
+											<radio-group v-model="heat">
+												<radio label="">默认</radio>
+												<radio label="most">最多点击</radio>
+												<radio label="least">最少点击</radio>
+											</radio-group>
+										</form-item>
+										<form-item label="分享时间排序:">
+											<radio-group v-model="time">
+												<radio label="">默认</radio>
+												<radio label="latest">最新发布</radio>
+												<radio label="earliest">最早发布</radio>
+											</radio-group>
+										</form-item>
+									</i-form>
+									<div>
+										<div v-for="(item, index)  in resList" class="span-piece">
+											<a v-bind:href="'video.html?name=' + item.RES_ID">
+												<img alt="Cover" v-bind:src="'getResourcesCover?CoverName=' + item.RESOURCES_COVER_SRC" style="border-radius:10px;" width="100%" height="100%"/>
+												<p class="a-ordinary">{{item.RESOURCES_TITLE}}</p>
+												<tag type="border"><icon type="md-clock" ></icon>{{item.UPLOAD_TIME}}</tag>
+												<tag type="border"><icon type="md-flame"></icon>{{item.CHECK_NUMBER}}</tag>
+											</a>
+											<a v-bind:href="'user.html?name=' + item.USER_ID"><tag type="border">{{item.USER_NAME}}</tag></a>
+										</div>
+									</div>
+									<div style="text-align: center; margin-top: 30px;" v-show="resCount==0">
+										<p>你要的这里没有啊!</p>
+									</div>
+									<div style="text-align: center; margin-top: 30px;" v-show="resCount>15">
+										<page :total="resCount" :page-size="pageSize" @on-change="PageDown" show-elevator ></page>
+									</div>
+								</div>
+							</tab-pane>
+							<tab-pane label="文章资源" name="article">
+								<div class="card-row" >
+									<i-form  :label-width="120">
+										<form-item label="点击量排序:">
+											<radio-group v-model="heat">
+												<radio label="">默认</radio>
+												<radio label="most">最多点击</radio>
+												<radio label="least">最少点击</radio>
+											</radio-group>
+										</form-item>
+										<form-item label="分享时间排序:">
+											<radio-group v-model="time">
+												<radio label="">默认</radio>
+												<radio label="latest">最多新发布</radio>
+												<radio label="earliest">最早发布</radio>
+											</radio-group>
+										</form-item>
+									</i-form>
+									<div>
+										<list item-layout="vertical">
+											<list-item v-for="item in resList" :key="item.RES_ID">
+												<a v-bind:href="'article.html?name=' + item.RES_ID">
+													<list-item-meta :title="item.RESOURCES_TITLE" :description="item.RESOURCES_LABEL" ></list-item-meta>
+												</a>
+												<template slot="action">
+													<li>
+														<icon type="md-flame" ></icon> {{item.CHECK_NUMBER}}
+													</li>
+													<li>
+														<icon type="md-time" ></icon>{{ item.UPLOAD_TIME }}
+													</li>
+													<li>
+														<icon type="md-person" ></icon><a class="a-ordinary" v-bind:href="'user.html?name=' + item.USER_ID">{{item.USER_NAME}}</a>
+													</li>
+												</template>
+											</list-item>
+										</list>
+									</div>
+									<div style="text-align: center; margin-top: 30px;" v-show="resCount==0">
+										<p>你要的这里没有啊!</p>
+									</div>
+									<div style="text-align: center; margin-top: 30px;" v-show="resCount>15">
+										<page :total="resCount" :page-size="pageSize" @on-change="PageDown" show-elevator ></page>
+									</div>
+								</div>
+							</tab-pane>
+							
+							<tab-pane label="项目源码" name="code">
+							<div class="card-row" >
+									<i-form  :label-width="120">
+										<form-item label="点击量排序:">
+											<radio-group v-model="heat">
+												<radio label="">默认</radio>
+												<radio label="most">最多点击</radio>
+												<radio label="least">最少点击</radio>
+											</radio-group>
+										</form-item>
+										<form-item label="分享时间排序:">
+											<radio-group v-model="time">
+												<radio label="">默认</radio>
+												<radio label="latest">最多新发布</radio>
+												<radio label="earliest">最早发布</radio>
+											</radio-group>
+										</form-item>
+									</i-form>
+									<div>
+										<div v-for="(item, index)  in resList" class="span-piece">
+											<a v-bind:href="'other.html?name=' + item.RES_ID">
+												<img alt="Cover" v-bind:src="'getResourcesCover?CoverName=' + item.RESOURCES_COVER_SRC" style="border-radius:10px;" width="100%" height="100%"/>
+												<p class="a-ordinary">{{item.RESOURCES_TITLE}}</p>
+												<tag type="border"><icon type="md-clock" ></icon>{{item.UPLOAD_TIME}}</tag>
+												<tag type="border"><icon type="md-flame"></icon>{{item.CHECK_NUMBER}}</tag>
+											</a>
+											<a v-bind:href="'user.html?name=' + item.USER_ID"><tag type="border">{{item.USER_NAME}}</tag></a>
+										</div>
+									</div>
+									<div style="text-align: center; margin-top: 30px;" v-show="resCount==0">
+										<p>你要的这里没有啊!</p>
+									</div>
+									<div style="text-align: center; margin-top: 30px;" v-show="resCount>15">
+										<page :total="resCount" :page-size="pageSize" @on-change="PageDown" show-elevator ></page>
+									</div>
+								</div>
+							</tab-pane>
+							
+							<tab-pane label="书籍文档" name="book">
+							<div class="card-row" >
+									<i-form  :label-width="120">
+										<form-item label="点击量排序:">
+											<radio-group v-model="heat">
+												<radio label="">默认</radio>
+												<radio label="most">最多点击</radio>
+												<radio label="least">最少点击</radio>
+											</radio-group>
+										</form-item>
+										<form-item label="分享时间排序:">
+											<radio-group v-model="time">
+												<radio label="">默认</radio>
+												<radio label="latest">最多新发布</radio>
+												<radio label="earliest">最早发布</radio>
+											</radio-group>
+										</form-item>
+									</i-form>
+									<div>
+										<div v-for="(item, index)  in resList" class="span-piece">
+											<a v-bind:href="'other.html?name=' + item.RES_ID">
+												<img alt="Cover" v-bind:src="'getResourcesCover?CoverName=' + item.RESOURCES_COVER_SRC" style="border-radius:10px;" width="100%" height="100%"/>
+												<p class="a-ordinary">{{item.RESOURCES_TITLE}}</p>
+												<tag type="border"><icon type="md-clock" ></icon>{{item.UPLOAD_TIME}}</tag>
+												<tag type="border"><icon type="md-flame"></icon>{{item.CHECK_NUMBER}}</tag>
+											</a>
+											<a v-bind:href="'user.html?name=' + item.USER_ID"><tag type="border">{{item.USER_NAME}}</tag></a>
+										</div>
+									</div>
+									<div style="text-align: center; margin-top: 30px;" v-show="resCount==0">
+										<p>你要的这里没有啊!</p>
+									</div>
+									<div style="text-align: center; margin-top: 30px;" v-show="resCount>15">
+										<page :total="resCount" :page-size="pageSize" @on-change="PageDown" show-elevator ></page>
+									</div>
+								</div>
+							</tab-pane>
+							<tab-pane label="工具软件" name="software">
+							<div class="card-row" >
+									<i-form  :label-width="120">
+										<form-item label="点击量排序:">
+											<radio-group v-model="heat">
+												<radio label="">默认</radio>
+												<radio label="most">最多点击</radio>
+												<radio label="least">最少点击</radio>
+											</radio-group>
+										</form-item>
+										<form-item label="分享时间排序:">
+											<radio-group v-model="time">
+												<radio label="">默认</radio>
+												<radio label="latest">最多新发布</radio>
+												<radio label="earliest">最早发布</radio>
+											</radio-group>
+										</form-item>
+									</i-form>
+									<div>
+										<div v-for="(item, index)  in resList" class="span-piece">
+											<a v-bind:href="'other.html?name=' + item.RES_ID">
+												<img alt="Cover" v-bind:src="'getResourcesCover?CoverName=' + item.RESOURCES_COVER_SRC" style="border-radius:10px;" width="100%" height="100%"/>
+												<p class="a-ordinary">{{item.RESOURCES_TITLE}}</p>
+												<tag type="border"><icon type="md-clock" ></icon>{{item.UPLOAD_TIME}}</tag>
+												<tag type="border"><icon type="md-flame"></icon>{{item.CHECK_NUMBER}}</tag>
+											</a>
+											<a v-bind:href="'user.html?name=' + item.USER_ID"><tag type="border">{{item.USER_NAME}}</tag></a>
+										</div>
+									</div>
+									<div style="text-align: center; margin-top: 30px;" v-show="resCount==0">
+										<p>你要的这里没有啊!</p>
+									</div>
+									<div style="text-align: center; margin-top: 30px;" v-show="resCount>15">
+										<page :total="resCount" :page-size="pageSize" @on-change="PageDown" show-elevator ></page>
+									</div>
+								</div>
+							</tab-pane>
+							
+							<tab-pane label="其他资源" name="other">
+							<div class="card-row" >
+									<i-form  :label-width="120">
+										<form-item label="点击量排序:">
+											<radio-group v-model="heat">
+												<radio label="">默认</radio>
+												<radio label="most">最多点击</radio>
+												<radio label="least">最少点击</radio>
+											</radio-group>
+										</form-item>
+										<form-item label="分享时间排序:">
+											<radio-group v-model="time">
+												<radio label="">默认</radio>
+												<radio label="latest">最多新发布</radio>
+												<radio label="earliest">最早发布</radio>
+											</radio-group>
+										</form-item>
+									</i-form>
+									<div>
+										<div v-for="(item, index)  in resList" class="span-piece">
+											<a v-bind:href="'other.html?name=' + item.RES_ID">
+												<img alt="Cover" v-bind:src="'getResourcesCover?CoverName=' + item.RESOURCES_COVER_SRC" style="border-radius:10px;" width="100%" height="100%"/>
+												<p class="a-ordinary">{{item.RESOURCES_TITLE}}</p>
+												<tag type="border"><icon type="md-clock" ></icon>{{item.UPLOAD_TIME}}</tag>
+												<tag type="border"><icon type="md-flame"></icon>{{item.CHECK_NUMBER}}</tag>
+											</a>
+											<a v-bind:href="'user.html?name=' + item.USER_ID"><tag type="border">{{item.USER_NAME}}</tag></a>
+										</div>
+									</div>
+									<div style="text-align: center; margin-top: 30px;" v-show="resCount==0">
+										<p>你要的这里没有啊!</p>
+									</div>
+									<div style="text-align: center; margin-top: 30px;" v-show="resCount>15">
+										<page :total="resCount" :page-size="pageSize" @on-change="PageDown" show-elevator ></page>
+									</div>
+								</div>
+							</tab-pane>
+<!-- 							<tab-pane label="用户" name="user"> -->
+							
+<!-- 							</tab-pane> -->
+						</tabs>
+					</div>
+				</div>
+			</div>
+			<back-top></back-top>
+		</div>
+	<script src="./js/vue.js"></script>
+	<script src="./js/iview.min.js"></script>
+	<script src="./js/en-US.js"></script>
+	<script src="./js/zh-CN.js"></script>
+	<script src="./js/vue-i18n.js"></script>
+	<script src="./js/axios.min.js"></script>
+	<script src="./js/qs.min.js"></script>
+	<script src="./js/md5.min.js"></script>
+	<script src="./js/searchPage.js"></script>
+	<script src="./js/search.js"></script>
+	<script type="text/javascript" src="./js/jquery-3.4.1.min.js"></script>
+	<script type="text/javascript" src="./js/mditor.js"></script>
+	
+	</body>
+</html>

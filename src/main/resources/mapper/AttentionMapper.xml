@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN"  
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="vip.pilipala.dao.AttentionMapper">
+	
+	<insert id="insertAttention" parameterType="java.util.Map">
+		INSERT INTO a_attention (USER_ID,USER_FOLLOWED,FOLLOWED_TIME) VALUES (#{UserID}, #{UserFollowed}, now());
+	</insert>
+	
+	<delete id="deleteAttention" parameterType="java.util.Map">
+		DELETE FROM a_attention WHERE USER_ID = #{UserID} AND USER_FOLLOWED = #{UserFollowed};
+	</delete>
+	
+	<select id="selectAttention" parameterType="java.util.Map" resultType="java.lang.Integer">
+		SELECT COUNT(1) FROM `astringent`.`a_attention` WHERE USER_ID = #{UserID} AND USER_FOLLOWED = #{UserFollowed};
+	</select>
+	
+	
+	<select id="getFollowMeList" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT 
+			user.USER_ID USER_ID, 
+			user.USER_NAME USER_NAME, 
+			user.USER_DESCRIPTION USER_DESCRIPTION, 
+			misc.DATA_INFO USER_LEVEL 
+		FROM 
+		a_attention atte LEFT JOIN a_user user ON atte.USER_ID = user.USER_ID  LEFT JOIN a_miscellaneous misc ON misc.CATEGROY=1 AND misc.DATA_ID=user.USER_LEVEL 
+		WHERE atte.USER_FOLLOWED =#{UserID} 
+		ORDER BY atte.FOLLOWED_TIME DESC 
+		LIMIT ${Page},10;
+	</select>
+	
+	<select id="getFollowMeNumber" parameterType="java.util.Map" resultType="java.lang.Integer">
+		SELECT 
+			COUNT(1) FOLLOW_ME_NUMBER
+		FROM 
+		a_attention atte LEFT JOIN a_user user ON atte.USER_ID = user.USER_ID  LEFT JOIN a_miscellaneous misc ON misc.CATEGROY=1 AND misc.DATA_ID=user.USER_LEVEL 
+		WHERE atte.USER_FOLLOWED =#{UserID} ;
+	</select>
+	
+	<select id="getIFollowList" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT 
+			user.USER_ID USER_ID, 
+			user.USER_NAME USER_NAME, 
+			user.USER_DESCRIPTION USER_DESCRIPTION, 
+			misc.DATA_INFO USER_LEVEL 
+		FROM 
+		a_attention atte LEFT JOIN a_user user ON atte.USER_FOLLOWED = user.USER_ID  LEFT JOIN a_miscellaneous misc ON misc.CATEGROY=1 AND misc.DATA_ID=user.USER_LEVEL 
+		WHERE atte.USER_ID =#{UserID} 
+		ORDER BY atte.FOLLOWED_TIME DESC 
+		LIMIT ${Page},10;
+	</select>
+	
+	<select id="getIFollowNumber" parameterType="java.util.Map" resultType="java.lang.Integer">
+		SELECT 
+			COUNT(1) FOLLOW_ME_NUMBER
+		FROM 
+		a_attention atte LEFT JOIN a_user user ON atte.USER_FOLLOWED = user.USER_ID  LEFT JOIN a_miscellaneous misc ON misc.CATEGROY=1 AND misc.DATA_ID=user.USER_LEVEL 
+		WHERE atte.USER_ID =#{UserID} ;
+	</select>
+	
+	<select id="opAttentionList" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT 
+			atte.USER_ID USER_ID,
+			user_one.USER_NAME USER_NAME, 
+			atte.USER_FOLLOWED USER_FOLLOWED,
+			user_two.USER_NAME FOLLOWED_NAME,
+			DATE_FORMAT(atte.FOLLOWED_TIME,'%y-%m-%d %H:%i:%s') FOLLOWED_TIME
+		FROM a_attention atte 
+			LEFT JOIN a_user user_one ON atte.USER_ID = user_one.USER_ID
+			LEFT JOIN a_user user_two ON atte.USER_FOLLOWED = user_two.USER_ID
+			WHERE 1=1
+			<if test="UserID!=null and UserID!=''">
+				AND atte.USER_ID=#{UserID} 
+			</if>
+			<if test="FollowedID!=null and FollowedID!=''">
+				AND atte.USER_FOLLOWED=#{FollowedID} 
+			</if>
+		ORDER BY atte.FOLLOWED_TIME DESC 
+		LIMIT ${Page},10;
+	</select>
+	
+	<select id="opAttentionCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+		SELECT 
+			COUNT(1)
+		FROM a_attention atte 
+			LEFT JOIN a_user user_one ON atte.USER_ID = user_one.USER_ID
+			LEFT JOIN a_user user_two ON atte.USER_FOLLOWED = user_two.USER_ID
+			WHERE 1=1
+			<if test="UserID!=null and UserID!=''">
+				AND atte.USER_ID=#{UserID} 
+			</if>
+			<if test="FollowedID!=null and FollowedID!=''">
+				AND atte.USER_FOLLOWED=#{FollowedID} 
+			</if>
+	</select>
+	
+	<delete id="opDeleteAttention" parameterType="java.util.Map">
+		DELETE FROM a_attention WHERE USER_ID = #{UserID} AND USER_FOLLOWED = #{FollowedID};
+	</delete>
+	
+	
+
+</mapper>

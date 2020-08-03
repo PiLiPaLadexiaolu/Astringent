@@ -1,0 +1,112 @@
+
+    .main-content {
+        width: 80%;
+        min-width: 1536px;
+        margin: 80px auto 0 auto;
+        /* background-color: #31dfb9; */
+        /* box-shadow: 5px 5px 10px #d1d1d1 ; */
+        padding: 50px;
+    }
+    .block-card {
+        width: 100%;
+        /* background-color: rgb(255, 255, 255); */
+    }
+    .card-row {
+        background-color: rgb(255, 255, 255);
+        box-shadow: 5px 5px 10px #b4b4b4 ;
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+    .left-card-row {
+        padding: 25px;
+        margin-right: 27px;
+        background-color: rgb(255, 255, 255);
+        box-shadow: 5px 5px 10px #b4b4b4 ;
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+    .content-carousel {
+        -webkit-border-radius: 15px;
+        -moz-border-radius: 15px;
+        border-radius: 15px;
+        overflow: hidden;
+        width: 1050px;
+        height: 450px;
+        /* margin: 0 auto 0 auto; */
+        box-shadow: 5px 5px 10px #b4b4b4 ;
+        margin-bottom: 20px;
+    }
+    .other-body {
+	
+    }
+    .other-body-li {
+        padding: 10px;
+        height: 92px;
+        width: 100%;
+    }
+    .other-body-li:hover {
+        background-color: #efefef;
+    }
+    .other-li-img {
+        height:100% ;
+        width: 112px;
+        overflow: hidden;
+        display:inline-block;
+        float:left;
+         padding: 5px 0;
+    }
+    .other-li-img img {
+        border-radius:5px;
+        height:63px ;
+        margin:0 auto;
+        width: 112px;
+    }
+    .other-li-body {
+        height:100%;
+        width : 225px;
+        display:inline-block;
+        font-size: 15px;
+        padding: 5px;
+        overflow: hidden;
+        float:right;
+    }
+    .other-li-body-all {
+        height:100%;
+        width : 100%;
+        display:inline-block;
+        font-size: 15px;
+        padding: 5px;
+        overflow: hidden;
+        float:right;
+    }
+    .other-li-body p{
+        line-height: 18px;
+        display: block;
+    }
+    .resources-span {
+        padding-right: 5px;
+    }
+
+    .span-piece {
+        display: inline-block;
+        width: 199px;
+        padding: 15px;
+        font-size: 18px;
+        font-weight: 800;
+        vertical-align:top;
+		
+    }
+    .span-piece img:hover {
+        box-shadow: 5px 5px 10px #a3a3a3 ;
+        /* 全部动画变化时间 */
+        transition: all 0.6s;
+    }
+    .footer {
+        text-align: center;
+        padding: 10px;
+        font-size: 18px;
+    }

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<link rel="stylesheet" type="text/css" href="./css/iview.css">
+		<link rel="stylesheet" type="text/css" href="./css/animate.css">
+		<link rel="stylesheet" href="./css/search.css">
+		<link rel="stylesheet" href="./css/article.css">
+		<link rel="stylesheet" type="text/css" href="./css/userPage.css">
+		<link rel="stylesheet" href="./css/same.css">
+		<link rel="shortcut icon" href="./images/favicon.ico">
+		<title>Ta的信息</title>
+	</head>
+	<body>
+		<div id="app" v-cloak>
+			<div class="main-head">
+				<div class="head-logo">
+					<a href="index.html"><img width="60px" height="60px" src="./images/logo.png" title="PiLiPaLa"/></a>
+				</div>
+				<div class="head-left">
+					<ul class="list-ul">
+						<li class="list-li"><a class="list-font a-ordinary" href="index.html">网站首页</a></li>
+						<li class="list-li"><a class="list-font a-ordinary" href="search.html?label=video">视频资源</a></li>
+						<li class="list-li"><a class="list-font a-ordinary" href="search.html?label=article">文章专栏</a></li>
+						<li class="list-li"><a class="list-font a-ordinary" href="search.html?label=code">项目源码</a></li>
+						<li class="list-li"><a class="list-font a-ordinary" href="search.html?label=book">书籍文档</a></li>
+						<li class="list-li"><a class="list-font a-ordinary" href="search.html?label=software">工具软件</a></li>
+						<li class="list-li"><a class="list-font a-ordinary" href="search.html?label=other">其他资源</a></li>
+					</ul>
+				</div>
+				
+				<div class="search-box">
+					<i-input type="text" v-model="resources" @on-enter="searchEvents" placeholder="搜索资源名..." ></i-input><span></span>
+				</div>
+				
+				<div class="head-right">
+					<ul v-if="name==''" class="list-ul">
+						<li class="list-li">
+							<a href="login.html" class="list-font a-ordinary">登录 | 注册</a>
+						</li>
+					</ul>
+					<ul v-else class="list-ul">
+						<li class="list-li">
+							<a href="" class="list-font a-ordinary">个人中心</a>
+						</li>
+						<li class="list-li">
+							<a href="#" class="list-font a-ordinary">{{name}}</a>
+						</li>
+						<li class="list-li">
+							<a @click="userOut" class="list-font a-ordinary">退出</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="main-content">
+				<div class="block-card">
+					<div class="card-row">
+						<span class="row-span font-p-type " style="font-size: 36px;">
+							{{userHomeInfo.USER_NAME}}
+						</span>
+						<span class="row-span font-p-type "> 
+							<tag color="primary">{{userHomeInfo.USER_LEVEL}}</tag>
+						</span>
+					</div>
+					<div class="card-row" >
+						<span class="row-span font-p-type " style="float: left;">
+							{{userHomeInfo.USER_DESCRIPTION}}
+						</span>
+						<span class="row-span font-type " style="float: right;">
+							<tag checkable :checked="attentionStatus" @on-change="attentionLab" color="primary">关注</tag>
+						</span>
+					</div>
+					<div class="card-row" >
+						<span class="row-span font-type " style="float: right;">
+							<icon type="md-folder" size="18"></icon>资源数:{{userHomeInfo.RES}}
+						</span>
+						<span class="row-span font-type " style="float: right;">
+							<icon type="md-chatboxes" size="18"></icon>评论数:{{userHomeInfo.COMMENT}}
+						</span>
+						<span class="row-span font-type " style="float: right;">
+							<icon type="md-glasses" size="18"></icon>关注用户数:{{userHomeInfo.ATTENTION}}
+						</span>
+						<span class="row-span font-type " style="float: right;">
+							<icon type="md-rose" size="18"></icon>粉丝数:{{userHomeInfo.FANS}}
+						</span>
+					</div>
+					<div class="card-row font-p-type" >
+						<tabs value="video" :animated="false" v-model="tabs" @on-click="tabClick">
+							<tab-pane  label="视频" name="video">
+								<div class="card-row" >
+									<div>
+										<div v-for="(item, index)  in resList" class="span-piece">
+											<a v-bind:href="'video.html?name=' + item.RES_ID">
+												<img alt="Cover" v-bind:src="'getResourcesCover?CoverName=' + item.RESOURCES_COVER_SRC" style="border-radius:10px;" width="100%" height="100%"/>
+												<p class="a-ordinary">{{item.RESOURCES_TITLE}}</p>
+												<tag type="border"><icon type="md-clock" ></icon>{{item.UPLOAD_TIME}}</tag>
+												<tag type="border"><icon type="md-flame"></icon>{{item.CHECK_NUMBER}}</tag>
+												<tag type="border">{{item.USER_NAME}}</tag>
+											</a>
+										</div>
+									</div>
+									<div style="text-align: center; margin-top: 30px;" v-show="resCount==0">
+										<p>这个人没有上传过哟!</p>
+									</div>
+									<div style="text-align: center; margin-top: 30px;" v-show="resCount>10">
+										<page :total="resCount" :page-size="pageSize" @on-change="PageDown" show-elevator ></page>
+									</div>
+								</div>
+							</tab-pane>
+							<tab-pane label="其他" name="other">
+								<div class="card-row" >
+									<div>
+										<div v-for="(item, index)  in resList" class="span-piece">
+											<a v-bind:href="'other.html?name=' + item.RES_ID">
+												<img alt="Cover" v-bind:src="'getResourcesCover?CoverName=' + item.RESOURCES_COVER_SRC" style="border-radius:10px;" width="100%" height="100%"/>
+												<p class="a-ordinary">{{item.RESOURCES_TITLE}}</p>
+												<tag type="border"><icon type="md-clock" ></icon>{{item.UPLOAD_TIME}}</tag>
+												<tag type="border"><icon type="md-flame"></icon>{{item.CHECK_NUMBER}}</tag>
+												<tag type="border">{{item.USER_NAME}}</tag>
+											</a>
+										</div>
+									</div>
+									<div style="text-align: center; margin-top: 30px;" v-show="resCount==0">
+										<p>这个人没有上传过哟!</p>
+									</div>
+									<div style="text-align: center; margin-top: 30px;" v-show="resCount>10">
+										<page :total="resCount" :page-size="pageSize" @on-change="PageDown" show-elevator ></page>
+									</div>
+								</div>
+							</tab-pane>
+							<tab-pane label="书籍" name="book">
+								<div class="card-row" >
+									<div>
+										<div v-for="(item, index)  in resList" class="span-piece">
+											<a v-bind:href="'other.html?name=' + item.RES_ID">
+												<img alt="Cover" v-bind:src="'getResourcesCover?CoverName=' + item.RESOURCES_COVER_SRC" style="border-radius:10px;" width="100%" height="100%"/>
+												<p class="a-ordinary">{{item.RESOURCES_TITLE}}</p>
+												<tag type="border"><icon type="md-clock" ></icon>{{item.UPLOAD_TIME}}</tag>
+												<tag type="border"><icon type="md-flame"></icon>{{item.CHECK_NUMBER}}</tag>
+												<tag type="border">{{item.USER_NAME}}</tag>
+											</a>
+										</div>
+									</div>
+									<div style="text-align: center; margin-top: 30px;" v-show="resCount==0">
+										<p>这个人没有上传过哟!</p>
+									</div>
+									<div style="text-align: center; margin-top: 30px;" v-show="resCount>10">
+										<page :total="resCount" :page-size="pageSize" @on-change="PageDown" show-elevator ></page>
+									</div>
+								</div>
+							</tab-pane>
+							<tab-pane label="源码" name="code">
+								<div class="card-row" >
+									<div>
+										<div v-for="(item, index)  in resList" class="span-piece">
+											<a v-bind:href="'other.html?name=' + item.RES_ID">
+												<img alt="Cover" v-bind:src="'getResourcesCover?CoverName=' + item.RESOURCES_COVER_SRC" style="border-radius:10px;" width="100%" height="100%"/>
+												<p class="a-ordinary">{{item.RESOURCES_TITLE}}</p>
+												<tag type="border"><icon type="md-clock" ></icon>{{item.UPLOAD_TIME}}</tag>
+												<tag type="border"><icon type="md-flame"></icon>{{item.CHECK_NUMBER}}</tag>
+												<tag type="border">{{item.USER_NAME}}</tag>
+											</a>
+										</div>
+									</div>
+									<div style="text-align: center; margin-top: 30px;" v-show="resCount==0">
+										<p>这个人没有上传过哟!</p>
+									</div>
+									<div style="text-align: center; margin-top: 30px;" v-show="resCount>10">
+										<page :total="resCount" :page-size="pageSize" @on-change="PageDown" show-elevator ></page>
+									</div>
+								</div>
+							</tab-pane>
+							<tab-pane label="软件" name="software">
+								<div class="card-row" >
+									<div>
+										<div v-for="(item, index)  in resList" class="span-piece">
+											<a v-bind:href="'other.html?name=' + item.RES_ID">
+												<img alt="Cover" v-bind:src="'getResourcesCover?CoverName=' + item.RESOURCES_COVER_SRC" style="border-radius:10px;" width="100%" height="100%"/>
+												<p class="a-ordinary">{{item.RESOURCES_TITLE}}</p>
+												<tag type="border"><icon type="md-clock" ></icon>{{item.UPLOAD_TIME}}</tag>
+												<tag type="border"><icon type="md-flame"></icon>{{item.CHECK_NUMBER}}</tag>
+												<tag type="border">{{item.USER_NAME}}</tag>
+											</a>
+										</div>
+									</div>
+									<div style="text-align: center; margin-top: 30px;" v-show="resCount==0">
+										<p>这个人没有上传过哟!</p>
+									</div>
+									<div style="text-align: center; margin-top: 30px;" v-show="resCount>10">
+										<page :total="resCount" :page-size="pageSize" @on-change="PageDown" show-elevator ></page>
+									</div>
+								</div>
+							</tab-pane>
+							<tab-pane label="文章专栏" name="article">
+								<div class="card-row" >
+									<div>
+										<list item-layout="vertical">
+											<list-item v-for="item in resList" :key="item.RES_ID">
+												<a v-bind:href="'article.html?name=' + item.RES_ID">
+													<list-item-meta :title="item.RESOURCES_TITLE" :description="item.RESOURCES_LABEL" ></list-item-meta>
+												</a>
+												<template slot="action">
+													<li>
+														<icon type="md-flame" ></icon> {{item.CHECK_NUMBER}}
+													</li>
+													<li>
+														<icon type="md-time" ></icon>{{ item.UPLOAD_TIME }}
+													</li>
+													<li>
+														<icon type="md-person" ></icon><a class="a-ordinary" v-bind:href="'user.html?name=' + item.USER_ID">{{item.USER_NAME}}</a>
+													</li>
+												</template>
+											</list-item>
+										</list>
+									</div>
+									<div style="text-align: center; margin-top: 30px;" v-show="resCount==0">
+										<p>这个人没有上传过哟!</p>
+									</div>
+									<div style="text-align: center; margin-top: 30px;" v-show="resCount>10">
+										<page :total="resCount" :page-size="pageSize" @on-change="PageDown" show-elevator ></page>
+									</div>
+								</div>
+							</tab-pane>
+						</tabs>
+					</div>
+				</div>
+			</div>
+			<back-top></back-top>
+		</div>
+	<script src="./js/vue.js"></script>
+	<script src="./js/iview.min.js"></script>
+	<script src="./js/en-US.js"></script>
+	<script src="./js/zh-CN.js"></script>
+	<script src="./js/vue-i18n.js"></script>
+	<script src="./js/axios.min.js"></script>
+	<script src="./js/qs.min.js"></script>
+	<script src="./js/md5.min.js"></script>
+	<script src="./js/userPage.js"></script>
+	<script src="./js/search.js"></script>
+	<script type="text/javascript" src="./js/jquery-3.4.1.min.js"></script>
+	<script type="text/javascript" src="./js/mditor.js"></script>
+	</body>
+</html>

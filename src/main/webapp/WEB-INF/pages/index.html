@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<link rel="stylesheet" type="text/css" href="./css/iview.css">
+		<link rel="stylesheet" type="text/css" href="./css/animate.css">
+		<link rel="stylesheet" href="./css/search.css">
+		<link rel="stylesheet" href="./css/article.css">
+		<link rel="stylesheet" href="./css/same.css">
+		<link rel="stylesheet" type="text/css" href="./css/index.css">
+		<link rel="shortcut icon" href="./images/favicon.ico">
+		<title>快来逛逛~</title>
+	</head>
+	<body>
+		<div id="app" v-cloak>
+			<div class="main-head">
+				<div class="head-logo">
+					<a href="index.html"><img width="60px" height="60px" src="./images/logo.png" title="PiLiPaLa"/></a>
+				</div>
+				<div class="head-left">
+					<ul class="list-ul">
+						<li class="list-li"><a class="list-font a-ordinary" href="index.html">网站首页</a></li>
+						<li class="list-li"><a class="list-font a-ordinary" href="search.html?label=video">视频资源</a></li>
+						<li class="list-li"><a class="list-font a-ordinary" href="search.html?label=article">文章专栏</a></li>
+						<li class="list-li"><a class="list-font a-ordinary" href="search.html?label=code">项目源码</a></li>
+						<li class="list-li"><a class="list-font a-ordinary" href="search.html?label=book">书籍文档</a></li>
+						<li class="list-li"><a class="list-font a-ordinary" href="search.html?label=software">工具软件</a></li>
+						<li class="list-li"><a class="list-font a-ordinary" href="search.html?label=other">其他资源</a></li>
+					</ul>
+				</div>
+				
+				<div class="search-box">
+					<i-input type="text" v-model="resources" @on-enter="searchEvents" placeholder="搜索资源名,用户名..." ></i-input><span></span>
+				</div>
+				
+				<div class="head-right">
+					<ul v-if="name==''" class="list-ul">
+						<li class="list-li">
+							<a href="login.html" class="list-font a-ordinary">登录 | 注册</a>
+						</li>
+					</ul>
+					<ul v-else class="list-ul">
+						<li class="list-li">
+							<a href="home.html" class="list-font a-ordinary">个人中心</a>
+						</li>
+						<li class="list-li">
+							<tooltip max-width="200" content="(●ˇ∀ˇ●)点我！可以查看历史记录哦!">
+								<a @click="historySwitch" class="list-font a-ordinary">{{name}}</a>
+							</tooltip>
+						</li>
+						<li class="list-li">
+							<a @click="userOut" class="list-font a-ordinary">退出</a>
+						</li>
+					</ul>
+				</div>
+				
+			</div>
+			
+			<div class="main-content">
+				<div class="block-card">
+					<row>
+						<i-col span="18">
+							<!--轮播图区域 -->
+							<div class="content-carousel ">
+								<!--请使用21:9分辨率图片 1050*450-->
+                                <carousel :autoplay-speed="4000" loop autoplay>
+                                    <carousel-item v-for="(item, index)  in carouse" :key="item.NUMBER">
+                                        <a v-bind:href="item.LINK"><img width="100%" v-bind:title="item.IMG_TITLE" v-bind:src="'carousel?CarouselName=' + item.IMG_URL"></a>
+                                    </carousel-item>
+                                </carousel>
+                            </div>
+                            <div class="left-card-row">
+                                <div style=" text-align: right;">
+                                    <Divider><h1 class="font-type">视频资源</h1></Divider>
+                                    <i-button type="primary" @click="videoRandomBtn" size="small" class="button-ordinary right-button" icon="md-nutrition">换一换</i-button>
+                                    <i-button type="primary"  size="small" class="button-ordinary right-button" @click="jump('search.html?label=video')" icon="md-planet">查看更多</i-button>
+                                </div>
+                                <!-- <row> -->
+                                    <div v-for="(item, index)  in randomVideoResourcesList" class="span-piece">
+                                    <!-- <i-col class="span-piece" span="6"> -->
+                                        <a v-bind:href="'video.html?name=' + item.RES_ID">
+                                            <img alt="Cover" v-bind:src="'getResourcesCover?CoverName=' + item.RESOURCES_COVER_SRC" style="border-radius:10px;" width="100%" height="100%"/>
+                                            <p class="a-ordinary">{{item.RESOURCES_TITLE}}</p>
+                                            <tag type="border"><icon type="md-clock" ></icon>{{item.UPLOAD_TIME}}</tag>
+                                            <tag type="border"><icon type="md-flame"></icon>{{item.CHECK_NUMBER}}</tag>
+                                            <tag type="border">{{item.USER_NAME}}</tag>
+                                        </a>
+                                    <!-- </i-col> -->
+                                   </div>
+                            </div>
+                            <div class="left-card-row">
+                                <div style=" text-align: right;">
+                                    <Divider><h1 class="font-type">项目源码</h1></Divider>
+                                    <i-button type="primary" @click="codeRandomBtn" size="small" class="button-ordinary right-button" icon="md-nutrition">换一换</i-button>
+                                    <i-button type="primary"  size="small" class="button-ordinary right-button" @click="jump('search.html?label=code')" icon="md-planet">查看更多</i-button>
+                                </div>
+                                <!-- <row> -->
+                                    <div v-for="(item, index)  in randomCodeResourcesList" class="span-piece">
+                                    <!-- <i-col class="span-piece" span="6"> -->
+                                        <a v-bind:href="'other.html?name=' + item.RES_ID">
+                                            <img alt="Cover" v-bind:src="'getResourcesCover?CoverName=' + item.RESOURCES_COVER_SRC" style="border-radius:10px;" width="100%" height="100%"/>
+                                            <p class="a-ordinary">{{item.RESOURCES_TITLE}}</p>
+                                            <tag type="border"><icon type="md-clock" ></icon>{{item.UPLOAD_TIME}}</tag>
+                                            <tag type="border"><icon type="md-flame"></icon>{{item.CHECK_NUMBER}}</tag>
+                                            <tag type="border">{{item.USER_NAME}}</tag>
+                                        </a>
+                                    <!-- </i-col> -->
+                                   </div>
+                            </div>
+                            <div class="left-card-row">
+                                <div style=" text-align: right;">
+                                    <Divider><h1 class="font-type">书籍文档</h1></Divider>
+                                    <i-button type="primary" @click="bookRandomBtn" size="small" class="button-ordinary right-button" icon="md-nutrition">换一换</i-button>
+                                    <i-button type="primary"  size="small" class="button-ordinary right-button" @click="jump('search.html?label=book')" icon="md-planet">查看更多</i-button>
+                                </div>
+                                <!-- <row> -->
+                                    <div v-for="(item, index)  in randomBookResourcesList" class="span-piece">
+                                    <!-- <i-col class="span-piece" span="6"> -->
+                                        <a v-bind:href="'other.html?name=' + item.RES_ID">
+                                            <img alt="Cover" v-bind:src="'getResourcesCover?CoverName=' + item.RESOURCES_COVER_SRC" style="border-radius:10px;" width="100%" height="100%"/>
+                                            <p class="a-ordinary">{{item.RESOURCES_TITLE}}</p>
+                                            <tag type="border"><icon type="md-clock" ></icon>{{item.UPLOAD_TIME}}</tag>
+                                            <tag type="border"><icon type="md-flame"></icon>{{item.CHECK_NUMBER}}</tag>
+                                            <tag type="border">{{item.USER_NAME}}</tag>
+                                        </a>
+                                    <!-- </i-col> -->
+                                   </div>
+                            </div>
+                            <div class="left-card-row">
+                                <div style=" text-align: right;">
+                                    <Divider><h1 class="font-type">工具软件</h1></Divider>
+                                    <i-button type="primary" @click="softwareRandomBtn" size="small" class="button-ordinary right-button" icon="md-nutrition">换一换</i-button>
+                                    <i-button type="primary"  size="small" class="button-ordinary right-button" @click="jump('search.html?label=software')" icon="md-planet">查看更多</i-button>
+                                </div>
+                                <!-- <row> -->
+                                    <div v-for="(item, index)  in randomSoftwareResourcesList" class="span-piece">
+                                    <!-- <i-col class="span-piece" span="6"> -->
+                                        <a v-bind:href="'other.html?name=' + item.RES_ID">
+                                            <img alt="Cover" v-bind:src="'getResourcesCover?CoverName=' + item.RESOURCES_COVER_SRC" style="border-radius:10px;" width="100%" height="100%"/>
+                                            <p class="a-ordinary">{{item.RESOURCES_TITLE}}</p>
+                                            <tag type="border"><icon type="md-clock" ></icon>{{item.UPLOAD_TIME}}</tag>
+                                            <tag type="border"><icon type="md-flame"></icon>{{item.CHECK_NUMBER}}</tag>
+                                            <tag type="border">{{item.USER_NAME}}</tag>
+                                        </a>
+                                    <!-- </i-col> -->
+                                   </div>
+                            </div>
+                            <div class="left-card-row">
+                                <div style=" text-align: right;">
+                                    <Divider><h1 class="font-type">其他资源</h1></Divider>
+                                    <i-button type="primary" @click="otherRandomBtn" size="small" class="button-ordinary right-button" icon="md-nutrition">换一换</i-button>
+                                    <i-button type="primary"  size="small" class="button-ordinary right-button" @click="jump('search.html?label=other')" icon="md-planet">查看更多</i-button>
+                                </div>
+                                <!-- <row> -->
+                                    <div v-for="(item, index)  in randomOtherResourcesList" class="span-piece">
+                                    <!-- <i-col class="span-piece" span="6"> -->
+                                        <a v-bind:href="'other.html?name=' + item.RES_ID">
+                                            <img alt="Cover" v-bind:src="'getResourcesCover?CoverName=' + item.RESOURCES_COVER_SRC" style="border-radius:10px;" width="100%" height="100%"/>
+                                            <p class="a-ordinary">{{item.RESOURCES_TITLE}}</p>
+                                            <tag type="border"><icon type="md-clock" ></icon>{{item.UPLOAD_TIME}}</tag>
+                                            <tag type="border"><icon type="md-flame"></icon>{{item.CHECK_NUMBER}}</tag>
+                                            <tag type="border">{{item.USER_NAME}}</tag>
+                                        </a>
+                                    <!-- </i-col> -->
+                                   </div>
+                            </div>
+                            
+                            
+                        </i-col>
+                        <i-col span="6">
+                            <div class="card-row">
+                                <tabs value="video" @on-click="tabClick">
+                                    <tab-pane label="视频" name="video">
+                                        <div class="other-body">
+                                        
+                                            <div class="other-body-li" v-for="(item, index) in resTop5">
+                                                <a class="a-ordinary" v-bind:href="'video.html?name=' + item.RES_ID">
+                                                    <div class="other-li-img">
+                                                        <img alt="Cover" v-bind:src="'getResourcesCover?CoverName=' + item.RESOURCES_COVER_SRC"/>
+                                                    </div>
+                                                    <div class="other-li-body">
+                                                        <p style="padding-bottom: 5px; font-size: 16px; font-weight: 800;">
+                                                        <span style="padding-right: 5px;  color:#000000; -webkit-mask:linear-gradient(to right, #4D555D, transparent ); font-size: 20px; font-weight: 800;">Top{{index+1}}</span>
+                                                        {{item.RESOURCES_TITLE}}</p>
+                                                        <p>
+                                                            <span class="resources-span">
+                                                                <icon type="ios-flame"></icon>
+                                                                <span>{{item.CHECK_NUMBER}}</span>
+                                                                <span>浏览</span>
+                                                            </span>
+                                                            <span class="resources-span">
+                                                                <icon type="md-time" ></icon>
+                                                                <span>{{item.UPLOAD_TIME}}</span>
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                            
+                                        </div>
+                                    </tab-pane>
+                                    <tab-pane label="软件工具" name="software">
+                                    	<div class="other-body-li" v-for="(item, index) in resTop5">
+                                                <a class="a-ordinary" v-bind:href="'other.html?name=' + item.RES_ID">
+                                                    <div class="other-li-img">
+                                                        <img alt="Cover" v-bind:src="'getResourcesCover?CoverName=' + item.RESOURCES_COVER_SRC"/>
+                                                    </div>
+                                                    <div class="other-li-body">
+                                                        <p style="padding-bottom: 5px; font-size: 16px; font-weight: 800;">
+                                                        <span style="padding-right: 5px;  color:#000000; -webkit-mask:linear-gradient(to right, #4D555D, transparent ); font-size: 20px; font-weight: 800;">Top{{index+1}}</span>
+                                                        {{item.RESOURCES_TITLE}}</p>
+                                                        <p>
+                                                            <span class="resources-span">
+                                                                <icon type="ios-flame"></icon>
+                                                                <span>{{item.CHECK_NUMBER}}</span>
+                                                                <span>浏览</span>
+                                                            </span>
+                                                            <span class="resources-span">
+                                                                <icon type="md-time" ></icon>
+                                                                <span>{{item.UPLOAD_TIME}}</span>
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                    </tab-pane>
+                                    <tab-pane label="书籍" name="book">
+                                    	<div class="other-body-li" v-for="(item, index) in resTop5">
+                                                <a class="a-ordinary" v-bind:href="'other.html?name=' + item.RES_ID">
+                                                    <div class="other-li-img">
+                                                        <img alt="Cover" v-bind:src="'getResourcesCover?CoverName=' + item.RESOURCES_COVER_SRC"/>
+                                                    </div>
+                                                    <div class="other-li-body">
+                                                        <p style="padding-bottom: 5px; font-size: 16px; font-weight: 800;">
+                                                        <span style="padding-right: 5px;  color:#000000; -webkit-mask:linear-gradient(to right, #4D555D, transparent ); font-size: 20px; font-weight: 800;">Top{{index+1}}</span>
+                                                        {{item.RESOURCES_TITLE}}</p>
+                                                        <p>
+                                                            <span class="resources-span">
+                                                                <icon type="ios-flame"></icon>
+                                                                <span>{{item.CHECK_NUMBER}}</span>
+                                                                <span>浏览</span>
+                                                            </span>
+                                                            <span class="resources-span">
+                                                                <icon type="md-time" ></icon>
+                                                                <span>{{item.UPLOAD_TIME}}</span>
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                    </tab-pane>
+                                    <tab-pane label="源码" name="code">
+                                    	<div class="other-body-li" v-for="(item, index) in resTop5">
+                                                <a class="a-ordinary" v-bind:href="'other.html?name=' + item.RES_ID">
+                                                    <div class="other-li-img">
+                                                        <img alt="Cover" v-bind:src="'getResourcesCover?CoverName=' + item.RESOURCES_COVER_SRC"/>
+                                                    </div>
+                                                    <div class="other-li-body">
+                                                        <p style="padding-bottom: 5px; font-size: 16px; font-weight: 800;">
+                                                        <span style="padding-right: 5px;  color:#000000; -webkit-mask:linear-gradient(to right, #4D555D, transparent ); font-size: 20px; font-weight: 800;">Top{{index+1}}</span>
+                                                        {{item.RESOURCES_TITLE}}</p>
+                                                        <p>
+                                                            <span class="resources-span">
+                                                                <icon type="ios-flame"></icon>
+                                                                <span>{{item.CHECK_NUMBER}}</span>
+                                                                <span>浏览</span>
+                                                            </span>
+                                                            <span class="resources-span">
+                                                                <icon type="md-time" ></icon>
+                                                                <span>{{item.UPLOAD_TIME}}</span>
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                    </tab-pane>
+                                    <tab-pane label="文章" name="article">
+                                    	<div class="other-body-li" v-for="(item, index) in resTop5">
+                                                <a class="a-ordinary" v-bind:href="'article.html?name=' + item.RES_ID">
+                                                    <div class="other-li-body-all">
+                                                        <p style="padding-bottom: 5px; font-size: 16px; font-weight: 800;">
+                                                        {{item.RESOURCES_TITLE}}</p>
+                                                        <p>
+                                                        	<span style="padding-right: 5px;  color:#000000; -webkit-mask:linear-gradient(to right, #4D555D, transparent ); font-size: 16px; font-weight: 800;">Top{{index+1}}</span>
+                                                            <span class="resources-span">
+                                                                <icon type="ios-flame"></icon>
+                                                                <span>{{item.CHECK_NUMBER}}</span>
+                                                                <span>浏览</span>
+                                                            </span>
+                                                            <span class="resources-span">
+                                                                <icon type="md-time" ></icon>
+                                                                <span>{{item.UPLOAD_TIME}}</span>
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                    </tab-pane>
+                                    <tab-pane label="其他" name="other">
+                                    	<div class="other-body-li" v-for="(item, index) in resTop5">
+                                                <a class="a-ordinary" v-bind:href="'other.html?name=' + item.RES_ID">
+                                                    <div class="other-li-img">
+                                                        <img alt="Cover" v-bind:src="'getResourcesCover?CoverName=' + item.RESOURCES_COVER_SRC"/>
+                                                    </div>
+                                                    <div class="other-li-body">
+                                                        <p style="padding-bottom: 5px; font-size: 16px; font-weight: 800;">
+                                                        <span style="padding-right: 5px;  color:#000000; -webkit-mask:linear-gradient(to right, #4D555D, transparent ); font-size: 20px; font-weight: 800;">Top{{index+1}}</span>
+                                                        {{item.RESOURCES_TITLE}}</p>
+                                                        <p>
+                                                            <span class="resources-span">
+                                                                <icon type="ios-flame"></icon>
+                                                                <span>{{item.CHECK_NUMBER}}</span>
+                                                                <span>浏览</span>
+                                                            </span>
+                                                            <span class="resources-span">
+                                                                <icon type="md-time" ></icon>
+                                                                <span>{{item.UPLOAD_TIME}}</span>
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                    </tab-pane>
+                                </tabs>
+                            </div>
+                            <div class="card-row">
+                                 <div style=" text-align: right; padding: 10px;">
+                                    <Divider><h3 class="font-type animated swing infinite">文章资源</h3></Divider>
+                                    <span>
+                                    	<a @click="articleRandomBtn" class="a-ordinary">换一换</a>
+                                    </span>
+                                     <span>
+                                    	<a href="search.html?label=article" class="a-ordinary">查看更多</a>
+                                    </span>
+                                </div>
+                            
+                            	<div class="other-body">
+									<div v-for="(item, index)  in randomArticleResourcesList" class="other-body-li">
+										<a class="a-ordinary" v-bind:href="'article.html?name=' + item.RES_ID">
+											<div class="other-li-body-all">
+												<p style="padding-bottom: 5px; font-size: 16px; font-weight: 800;">{{item.RESOURCES_TITLE}}</p>
+												<p>
+													<span class="resources-span">
+														<icon type="md-time" ></icon>
+														<span>{{item.UPLOAD_TIME}}</span>
+													</span>
+													
+													<span class="resources-span">
+														<icon type="ios-flame"></icon>
+														<span>{{item.CHECK_NUMBER}}</span>
+														<span>浏览</span>
+													</span>
+													
+													<span class="resources-span">
+														<icon type="md-person" ></icon>
+														<span>{{item.USER_NAME}}</span>
+													</span>
+													
+												</p>
+											</div>
+										</a>
+									</div>
+								</div>
+                            </div>
+                        </i-col>
+                    </row>
+                </div>
+			</div>
+			<back-top></back-top>
+			<Drawer title="浏览历史" :closable="false" width="450" v-model="history">
+					<div class="other-body-li" v-for="(item, index) in historyList" >
+						<a class="a-ordinary" v-bind:href="'other.html?name=' + item.RES_ID" v-if="item.RESOURCES_TYPE != 2 &&item.RESOURCES_TYPE !=1 ">
+							<div class="other-li-img">
+								<img alt="Cover" v-bind:src="'getResourcesCover?CoverName=' + item.RESOURCES_COVER_SRC"/>
+							</div>
+							<div class="other-li-body">
+								<p style="padding-bottom: 5px; font-size: 16px; font-weight: 800;"  v-if="item.RESOURCES_TITLE==null||item.RESOURCES_TITLE==''">
+									该资源以被删除!
+								</p>
+								<p style="padding-bottom: 5px; font-size: 16px; font-weight: 800;"  v-else>
+									{{item.RESOURCES_TITLE}}
+								</p>
+								<p>
+									<span class="resources-span">
+									<icon type="ios-flame"></icon>
+										<span>{{item.CHECK_NUMBER}}</span>
+										<span>浏览</span>
+									</span>
+									<span class="resources-span">
+										<icon type="md-time" ></icon>
+										<span>{{item.HISTORY_TIME}}</span>
+									</span>
+								</p>
+							</div>
+						</a>
+						<a class="a-ordinary" v-bind:href="'video.html?name=' + item.RES_ID" v-if="item.RESOURCES_TYPE==1">
+							<div class="other-li-img">
+								<img alt="Cover" v-bind:src="'getResourcesCover?CoverName=' + item.RESOURCES_COVER_SRC"/>
+							</div>
+							<div class="other-li-body">
+								<p style="padding-bottom: 5px; font-size: 16px; font-weight: 800;"  v-if="item.RESOURCES_TITLE==null||item.RESOURCES_TITLE==''">
+									该资源以被删除!
+								</p>
+								<p style="padding-bottom: 5px; font-size: 16px; font-weight: 800;"  v-else>
+									{{item.RESOURCES_TITLE}}
+								</p>
+								<p>
+									<span class="resources-span">
+									<icon type="ios-flame"></icon>
+										<span>{{item.CHECK_NUMBER}}</span>
+										<span>浏览</span>
+									</span>
+									<span class="resources-span">
+										<icon type="md-time" ></icon>
+										<span>{{item.HISTORY_TIME}}</span>
+									</span>
+								</p>
+							</div>
+						</a>
+						<a class="a-ordinary" v-bind:href="'article.html?name=' + item.RES_ID" v-if="item.RESOURCES_TYPE==2">
+							<div class="other-li-body-all">
+								<p style="padding-bottom: 5px; font-size: 16px; font-weight: 800;"  v-if="item.RESOURCES_TITLE==null||item.RESOURCES_TITLE==''">
+									该资源以被删除!
+								</p>
+								<p style="padding-bottom: 5px; font-size: 16px; font-weight: 800;"  v-else>
+									{{item.RESOURCES_TITLE}}
+								</p>
+									<span class="resources-span">
+										<icon type="ios-flame"></icon>
+										<span>{{item.CHECK_NUMBER}}</span>
+										<span>浏览</span>
+									</span>
+									<span class="resources-span">
+										<icon type="md-time" ></icon>
+										<span>{{item.HISTORY_TIME}}</span>
+									</span>
+								</p>
+							</div>
+						</a>
+					</div>
+    			</Drawer>
+			<div class="footer">
+				<p>Author: <a class="a-ordinary" href="https://www.pilipala.vip">PiLiPaLa</a></p>
+			</div>
+		</div>
+	<script src="./js/vue.js"></script>
+	<script src="./js/iview.min.js"></script>
+	<script src="./js/en-US.js"></script>
+	<script src="./js/zh-CN.js"></script>
+	<script src="./js/vue-i18n.js"></script>
+	<script src="./js/axios.min.js"></script>
+	<script src="./js/qs.min.js"></script>
+	<script src="./js/md5.min.js"></script>
+	<script src="./js/index.js"></script>
+	<script src="./js/search.js"></script>
+	<script type="text/javascript" src="./js/jquery-3.4.1.min.js"></script>
+	<script type="text/javascript" src="./js/mditor.js"></script>
+	</body>
+</html>

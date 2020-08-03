@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<link rel="stylesheet" type="text/css" href="./css/iview.css">
+		<link rel="stylesheet" type="text/css" href="./css/animate.css">
+		<link rel="stylesheet" href="./css/search.css">
+		<link rel="stylesheet" href="./css/article.css">
+		<link rel="stylesheet" type="text/css" href="./css/same.css">
+		<link rel="stylesheet" type="text/css" href="./css/articlePage.css">
+		<link rel="shortcut icon" href="./images/favicon.ico">
+		<title>文章资源</title>
+	</head>
+	<body>
+		<div id="app" v-cloak>
+			<div class="main-head">
+				<div class="head-logo">
+					<a href="index.html"><img width="60px" height="60px" src="./images/logo.png" title="PiLiPaLa"/></a>
+				</div>
+				<div class="head-left">
+					<ul class="list-ul">
+						<li class="list-li"><a class="list-font a-ordinary" href="index.html">网站首页</a></li>
+						<li class="list-li"><a class="list-font a-ordinary" href="search.html?label=video">视频资源</a></li>
+						<li class="list-li"><a class="list-font a-ordinary" href="search.html?label=article">文章专栏</a></li>
+						<li class="list-li"><a class="list-font a-ordinary" href="search.html?label=code">项目源码</a></li>
+						<li class="list-li"><a class="list-font a-ordinary" href="search.html?label=book">书籍文档</a></li>
+						<li class="list-li"><a class="list-font a-ordinary" href="search.html?label=software">工具软件</a></li>
+						<li class="list-li"><a class="list-font a-ordinary" href="search.html?label=other">其他资源</a></li>
+					</ul>
+				</div>
+				<div class="search-box">
+					<i-input type="text" v-model="resources" @on-enter="searchEvents" placeholder="搜索资源名,用户名..." ></i-input><span></span>
+				</div>
+				<div class="head-right">
+					<ul v-if="name==''" class="list-ul">
+						<li class="list-li">
+							<a href="login.html" class="list-font a-ordinary">登录 | 注册</a>
+						</li>
+					</ul>
+					<ul v-else class="list-ul">
+						<li class="list-li">
+							<a href="home.html" class="list-font a-ordinary">个人中心</a>
+						</li>
+						<li class="list-li">
+							<a href="#" class="list-font a-ordinary">{{name}}</a>
+						</li>
+						<li class="list-li">
+							<a @click="userOut" class="list-font a-ordinary">退出</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="main-content">
+				<div class="content-block" style="min-width: 1490px;">
+					<row>
+						<i-col span="18">
+							<div class="block">
+							<div class="block-row">
+								<h1 class="font-type" style="text-align: left; font-size: 32px;">{{resourcesInfo.RESOURCES_TITLE}}</h1>
+							</div>
+							<div class="block-row font-p-type" style="text-align: left;">
+								<icon type="md-paper" ></icon>
+								<span class="ico-span">{{resourcesInfo.RESOURCES_TYPE}}</span>
+								<icon type="md-time" ></icon>
+								<span class="ico-span">{{resourcesInfo.UPLOAD_TIME}}</span>
+								<icon type="md-person" ></icon>
+								<span class="ico-span">{{resourcesInfo.USER_NAME}}</span>
+								<icon type="md-flame" ></icon>
+								<span class="ico-span">{{resourcesInfo.CHECK_NUMBER}}</span>
+								<icon type="md-pricetag" ></icon>
+								<span class="ico-span">{{resourcesInfo.RESOURCES_LABEL}}</span>
+							</div>
+							<div class="block-row">
+								<!--水平线 -->
+								<divider></divider>
+							</div>
+							<div class="block-row">
+								<div class="article" id="article" v-html="resourcesInfo.RESOURCES_CONTENT">
+									<!-- 显示数据库HTML代码 -->
+								</div>
+							</div>
+							<div class="block-row" style="height: 50px; text-align: left;">
+								<Poptip word-wrap width="200" trigger="hover" content="如果你认为这个文章有不良内容你可以通过填写理由进行举报!">
+									<span><a @click="reportBtn" class="a-ordinary font-p-type" >#匿名举报</a></span>
+								</Poptip>
+							</div>
+							</div>
+							<div class="block">
+							<div class="block-row">
+								<divider orientation="left"><span class="font-p-type">发表评论</span></divider>
+								<row>
+								<i-col span="21">
+									<i-input  maxlength="300" v-model="comment" show-word-limit type="textarea" :rows="4" placeholder="我有个大胆的想法!" style=" width: 100%; " ></i-input>
+								</i-col>
+								<i-col span="3">
+									<a @click="commentDown" class="a-ordinary" >
+										<div class="commitBtn">提交评论</div>
+									</a>
+								</i-col>
+								</row>
+							</div>
+							<div class="block-row" v-if="commentCount!=0">
+								<div v-for="(item, index)  in commentContent" v-bind:key="item.comment_id" class="comments-li">
+									<row>
+										<i-col span="22">
+											<span>
+												<p class="font-p-type">{{item.USER_NAME}}</p>
+												<p class="font-type">{{ item.COMMENT_CONTENT }}</p>
+												<p class="font-type" style="float: right;"><span>#</span>{{index+1+(pageNumber-1)*10}}<span class="resources-span"><span>#</span>{{item.COMMENT_DATE}}</span></p>
+											</span>
+										</i-col>
+										<i-col span="2"></i-col>
+									</row>
+								</div>
+								<div style="text-align: center;">
+									<page :total="commentCount" :current="pageNumber" @on-change="PageDown" />
+								</div>
+							</div>
+							<div class="block-row" style="text-align: center;" v-else>
+								<p class="font-p-type">还没有人评论呢!</p>
+							</div>
+							<div class="block-row" style="height: 50px;"></div>
+							</div>
+						</i-col>
+						<i-col span="6">
+							<div style="min-width: 345px;">
+								<div class="block" style="text-align: center;">
+									<div class="block-row">
+										<avatar src="./images/avatar.png" size="100" />
+									</div>
+									<div class="block-row ">
+										<a v-bind:href="'user.html?name='+resourcesInfo.USER_ID" class="font-p-type a-ordinary">{{resourcesInfo.USER_NAME}}</a>
+									</div>
+									<div class="block-row">
+										<p class="font-type">{{resourcesInfo.USER_DESCRIPTION}}</p>
+									</div>
+									<div>
+										<row class="block-row font-type">
+											<i-col span="8"><icon type="ios-paper" ></icon><span>资源数:{{resourcesInfo.RESOURCES_NUMBER}}</span></i-col>
+											<i-col span="8"><tag checkable :checked="attentionStatus" @on-change="attentionLab" color="primary">关注</tag></i-col>
+											<i-col span="8"><tag color="primary">{{resourcesInfo.USER_LEVEL}}</tag></i-col>
+										</row>
+									</div>
+								</div>
+								<div class="block font-type">
+									<divider><h3>随便看看</h3></divider>
+									<div class="other-body">
+										<div v-for="(item, index)  in randomResourcesList" class="other-body-li">
+											<a class="a-ordinary" v-bind:href="'article.html?name=' + item.RES_ID">
+												<div class="other-li-body">
+													<p style="padding-bottom: 5px;">{{item.RESOURCES_TITLE}}</p>
+													<p>
+														<span class="resources-span">
+															<icon type="ios-flame"></icon>
+															<span>{{item.CHECK_NUMBER}}</span>
+															<span>浏览</span>
+														</span>
+														<span class="resources-span">
+															<icon type="md-time" ></icon>
+															<span>{{item.UPLOAD_TIME}}</span>
+														</span>
+													</p>
+												</div>
+											</a>
+										</div>
+									</div>
+								</div>
+								<div class="block font-type">
+									<divider><h3>作者其他资源</h3></divider>
+									<div class="other-body">
+										<div v-for="(item, index)  in randomUserResourcesList" class="other-body-li">
+											<a class="a-ordinary" v-bind:href="'article.html?name=' + item.RES_ID">
+												<div class="other-li-body">
+													<p style="padding-bottom: 5px;">{{item.RESOURCES_TITLE}}</p>
+													<p>
+														<span class="resources-span">
+															<icon type="ios-flame"></icon>
+															<span>{{item.CHECK_NUMBER}}</span>
+															<span>浏览</span>
+														</span>
+														<span class="resources-span">
+															<icon type="md-time" ></icon>
+															<span>{{item.UPLOAD_TIME}}</span>
+														</span>
+													</p>
+												</div>
+											</a>
+										</div>
+									</div>
+								</div>
+							</div>	
+						</i-col>
+					</row>
+				</div>
+			</div>
+			<back-top></back-top>
+		</div>
+	<script src="./js/vue.js"></script>
+	<script src="./js/iview.min.js"></script>
+	<script src="./js/en-US.js"></script>
+	<script src="./js/zh-CN.js"></script>
+	<script src="./js/vue-i18n.js"></script>
+	<script src="./js/axios.min.js"></script>
+	<script src="./js/qs.min.js"></script>
+	<script src="./js/md5.min.js"></script>
+	<script src="./js/search.js"></script>
+	<script src="./js/jquery-3.4.1.min.js"></script>
+	<script src="./js/mditor.js"></script>
+	<script src="./js/articlePage.js"></script>
+	</body>
+</html>

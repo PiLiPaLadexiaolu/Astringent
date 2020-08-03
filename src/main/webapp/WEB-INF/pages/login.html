@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<link rel="stylesheet" type="text/css" href="./css/iview.css">
+		<link rel="stylesheet" type="text/css" href="./css/animate.css">
+		<link rel="stylesheet" type="text/css" href="./css/login.css">
+		<link rel="stylesheet" type="text/css" href="./css/same.css">
+		<link rel="shortcut  icon" href="./images/favicon.ico" type="image/x-icon" />
+		<title>Welcome</title>
+	</head>
+	<body>
+		<div id="app" v-cloak>
+		<!-- 登录视图 -->
+			<div class="layout">
+				<i-header class="i-layout-header"><p class="header-title animated bounce infinite">{{ $t("internationalizationCode.A000001") }}</p></i-header>
+				<i-content class="i-layout-content">
+					<div class="card-block">
+						<i-form>
+							<div class="row-head">{{ $t("internationalizationCode.A000004") }}</div>
+							<div class="row-content">
+								<p>{{ $t("internationalizationCode.A000002") }}</p>
+								<i-input v-model="username" @on-blur="emailCheck" type="email" placeholder="Enter Email Address..."></i-input>
+							</div>
+							<div class="row-content">
+								<p>{{ $t("internationalizationCode.A000003") }}</p>
+								<i-input v-model="password" type="password" placeholder="Enter password..."></i-input>
+							</div>
+							<div class="row-content">
+								<i-switch v-model="btnSwitch"  @click="btnSwitch = !btnSwitch" ></i-switch>
+								<span>{{ $t("internationalizationCode.A000006") }}</span>
+							</div>
+							<div class="row-content">
+								<i-button type="primary" class="button-ordinary" @click="loginDown" long>{{ $t("internationalizationCode.A000004") }}</i-button>
+							</div>
+							<div class="row-content">
+								<i-button type="primary" class="button-ordinary" @click="register" long>{{ $t("internationalizationCode.A000005") }}</i-button>
+							</div>
+							<div class="row-content">
+								<p style="text-align: center;"><a class="a-ordinary" @click="getBackDown">{{ $t("internationalizationCode.A000009")}}</a></p>
+							</div>
+						</i-form>
+					</div>
+				</i-content>
+				<!-- 注册视图 -->
+				<drawer id="register" title="加入我们吧!" v-model="registerSwitch" width="700" :mask-closable="true" :styles="styles">
+					<div class="register-body">
+						<i-form>
+							<div class="register-content">
+								<p>输入邮箱地址</p>
+								<i-input v-model="username" type="email" @on-change="emailSwitchCheck" placeholder="Enter Email Address..."></i-input>
+							</div>
+							<div class="register-content">
+								<p>邮箱验证码</p>
+								<span>
+									<i-input v-model="emailVerification" type="text" @on-blur="emailVerificationCheck" placeholder="验证码" style="width: 57%;"></i-input>
+								</span>
+								<!-- <i-button type="primary" style="width: 37%;" class="button-ordinary" :disabled="emailSwitch">获取邮箱验证码</i-button> -->
+								<span>
+									<i-button type="primary" :loading="emailLoading" class="button-ordinary" style="margin-top:5px; width: 41%" icon="md-paper-plane" :disabled="emailSwitch" @click="sendEmail">
+										<span v-if="!emailLoading">Click me!</span>
+										<span v-else>{{time}}秒后可再次发送</span>
+									</i-button>
+								</span>
+							</div>
+							<div class="register-content">
+								<p>请输入你的密码</p>
+								<i-input v-model="password" type="password" placeholder="Enter password..."></i-input>
+							</div>
+							<div class="register-content">
+								<p>请再次输入你的密码</p>
+								<i-input v-model="passwordVerification" type="password" placeholder="Enter password..."></i-input>
+							</div>
+							<div class="register-content">
+								<i-button type="primary" @click="registerDown" class="button-ordinary" long>注册</i-button>
+							</div>
+						</i-form>
+					</div>
+				</drawer>
+				<!-- 找回视图 -->
+				<drawer id="goBack" title="把它找回来?" v-model="goBackSwitch" width="700" :mask-closable="true" :styles="styles">
+					<div class="register-body">
+						<i-form>
+							<div class="register-content">
+								<p>输入要找回的邮箱地址</p>
+								<i-input v-model="username" type="email" @on-change="emailSwitchCheck" placeholder="Enter Email Address..."></i-input>
+							</div>
+							<div class="register-content">
+								<p>邮箱验证码</p>
+								<span>
+									<i-input v-model="emailVerification" type="text" @on-blur="emailVerificationCheck" placeholder="验证码" style="width: 57%;"></i-input>
+								</span>
+								<!-- <i-button type="primary" style="width: 37%;" class="button-ordinary" :disabled="emailSwitch">获取邮箱验证码</i-button> -->
+								<span>
+									<i-button type="primary" :loading="emailLoading" class="button-ordinary" style="margin-top:5px; width: 41%" icon="md-paper-plane" :disabled="emailSwitch" @click="sendEmail">
+										<span v-if="!emailLoading">Click me!</span>
+										<span v-else>{{time}}秒后可再次发送</span>
+									</i-button>
+								</span>
+							</div>
+							<div class="register-content">
+								<p>重置你的密码</p>
+								<i-input v-model="password" type="password" placeholder="Enter password..."></i-input>
+							</div>
+							<div class="register-content">
+								<p>请再次输入你的密码</p>
+								<i-input v-model="passwordVerification" type="password" placeholder="Enter password..."></i-input>
+							</div>
+							<div class="register-content">
+								<i-button type="primary" @click="resetDown" class="button-ordinary" long>修改</i-button>
+							</div>
+						</i-form>
+					</div>
+				</drawer>
+				<i-footer class="i-layout-footer">
+					<p>Author: <a class="a-ordinary" href="https://www.pilipala.vip">PiLiPaLa</a></p>
+					<p> <a class="a-ordinary" @click="china">中文</a>  <a class="a-ordinary" @click="english">English</a> </p>
+				</i-footer>
+			</div>
+		</div>
+	<script src="./js/vue.js"></script>
+	<script src="./js/iview.min.js"></script>
+	<script src="./js/en-US.js"></script>
+	<script src="./js/zh-CN.js"></script>
+	<script src="./js/vue-i18n.js"></script>
+	<script src="./js/axios.min.js"></script>
+	<script src="./js/qs.min.js"></script>
+	<script src="./js/login.js"></script>
+	</body>
+</html>

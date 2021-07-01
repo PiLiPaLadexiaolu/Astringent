@@ -31,8 +31,8 @@
 				<prop key="mail.smtp.starttls.enable">true</prop>
 			</props>
 		</property>
-		<property name="username" value="2232310877@qq.com"></property>
-		<property name="password" value="isbfmxinzdlbeabg"></property>
+		<property name="username" value="xxxxxxxx@qq.com"></property>
+		<property name="password" value="xxxxxxx"></property>
 		<property name="port" value="465"></property>
 	</bean>
 	
